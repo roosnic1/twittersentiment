@@ -48,9 +48,24 @@
 
 
 
-\chapter{Kapitel}
-\section{Einleitung}
-\subsection{Ausgangslage}
-balsdasld,salds
+\chapter{Einleitung}
+\section{Motivation}
+Mit einer Sentiment Analyse über einen gewissen Zeitraum lässt sich zeigen was die Twitter Community von einem Brand, einer Firma, Personen usw. haltet. Diese Daten könnten Grafisch dargestellt werden und mit dem Aktienkurs der Firma oder signifikanten Ereignissen zu einem gewissen Zeitpunkt verglichen werden. 
+\section{Idee}
+Mit Suchwörtern wird nach allen Tweets gesucht welche zu einem bestimmten Thema/Firma/Hashtag gehören. Diese Tweets werden mit einer Sentiment Analyse Positiv oder Negativ eingestuft. Diese Einstufung wird in einem Zeit/Polarität Graph dargestellt. \\
+Für diese Idee wird eine grosse Menge von Tweets über einen längeren Zeitraum (minimum 2 Monate) benötigt. Momentan ist noch nicht klar ob diese Menge vorhanden ist. Alternativ kann man auch die aktuellen Tweets nach Brand/Firma/Person filtern und über diese Tweets eine Sentiment Analyse laufen lassen.
+\section{Meilensteine}
+\begin{itemize}
+\item Twitter-API anbinden/implementieren
+\item Historische Sammlung von Tweets besorgen
+\item Evaluation von MapReduce und MPI für unser Problem
+\item Paralleles filtern von Tweets nach Keyword/Hashtag implementieren
+\item Sentiment Analysis mit NLTK Classifier implementieren (Naive Bayes und MaxEnt)
+\item Classifier Trainieren
+\item Performanceanalyse erstellen
+\item Vergleich Naive Bayes mit MaxEnt
+\item GUI programmieren mit Plot des Stimmungsverlaufs
+\item Dokumentation schreiben (Seminararbeit)
+\end{itemize}
 
 \end{document}
