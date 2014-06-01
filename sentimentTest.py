@@ -4,14 +4,17 @@
 import tweetTest
 import nltk
 from nltk.classify import NaiveBayesClassifier
-from nltk.corpus import movie_reviews
+from nltk.corpus import movie_reviews, stopwords
 import collections
 
 
 def bag_of_words(words):
 	return dict([(word, True) for word in words])
 
-def label_feats_from_corpus(corp, feature_detector=bag_of_words):
+def filtered_bag_of_words(words):
+	return bag_of_words(set(words) - set(stopwords.words('english')))
+
+def label_feats_from_corpus(corp, feature_detector=filtered_bag_of_words):
 	label_feats = collections.defaultdict(list)
 	for label in corp.categories():
 		for fileid in corp.fileids(categories=[label]):
