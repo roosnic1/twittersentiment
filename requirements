@@ -4,3 +4,4 @@ requests-oauthlib==0.4.0
 tweepy==2.2
 twython==3.1.2
 wsgiref==0.1.2
+nltk
