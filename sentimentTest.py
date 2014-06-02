@@ -12,7 +12,11 @@ def bag_of_words(words):
 	return dict([(word, True) for word in words])
 
 def filtered_bag_of_words(words):
-	return bag_of_words(set(words) - set(stopwords.words('english')))
+	""" eliminate english stopwords """
+	if not hasattr(filtered_bag_of_words, "filterwords"):
+		filtered_bag_of_words.filterwords = set(stopwords.words('english'))
+		#filtered_bag_of_words.filterwords.update(". , ; ! ? ( ) @".split())
+	return bag_of_words(set(words) - filtered_bag_of_words.filterwords)
 
 def label_feats_from_corpus(corp, feature_detector=filtered_bag_of_words):
 	label_feats = collections.defaultdict(list)
