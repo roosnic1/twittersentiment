@@ -3,12 +3,14 @@
 
 import tweetTest
 import nltk
-from nltk.classify import NaiveBayesClassifier
+from nltk.classify import NaiveBayesClassifier, MaxentClassifier
 from nltk.corpus import movie_reviews, stopwords
 from nltk.tokenize import wordpunct_tokenize
 import collections
 import re
 from HTMLParser import HTMLParser
+from nltk.classify.scikitlearn import SklearnClassifier
+from sklearn.linear_model import LogisticRegression
 
 polarity_map = {"4":"pos", "2":"neut", "0":"neg"}
 
@@ -109,10 +111,13 @@ if __name__ == "__main__":
 	print "training set length: %i  test set length: %i" % (len(training_set), len(test_set))
 	print prettifyFeatureSet(test_set)
 	print "training classifier..."
-	classifier = NaiveBayesClassifier.train(training_set)
+	#classifier = NaiveBayesClassifier.train(training_set)
+	#classifier = MaxentClassifier.train(training_set, algorithm='iis', max_iter=99, min_lldelta=0.01)
+	#classifier = MaxentClassifier.train(training_set)
+	classifier = SklearnClassifier(LogisticRegression()).train(training_set)
 	print "calculating accuracy..."
 	print 'accuracy:', nltk.classify.util.accuracy(classifier, test_set)
-	classifier.show_most_informative_features(30)
+	#classifier.show_most_informative_features(30)
 
 	negfeat = bag_of_words(['the', 'plot', 'was', 'ludicrous'])
 	print classifier.classify(negfeat)
