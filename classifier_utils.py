@@ -40,6 +40,14 @@ def label_feats_from_tweets(tweetlist):
 			label_feats[polarity_map[tweet['polarity']]].append(features)
 	return label_feats
 
+def test_set_from_tweets(tweetlist):
+	test_set = []
+	for tweet in tweetlist:
+		if tweet['polarity'] != "2":
+			features = filtered_bag_of_words(wordpunct_tokenize(preprocessTweet(tweet['text'])))
+			test_set.append((features, polarity_map[tweet['polarity']]))
+	return test_set
+
 def split_label_feats(lfeats, split=0.75):
 	""" splits up the training set """
 	train_feats = []
@@ -68,7 +76,7 @@ def preprocessTweet(tweet):
 	# remove multiple points
 	tweet = re.sub('[\.]+','.',tweet) # better results when only considering points, so no ! ?
 	# decode html entities
-	tweet = HTMLParser().unescape(tweet)
+	#tweet = HTMLParser().unescape(tweet)
 	# remove numbers (doesnt catch numbers at start of tweet, like "7 hours. 7 freakin hours", but we want "3d" to be included) this would easier be done on a per word filtering
 	tweet = re.sub(' [0-9]+ ',' ',tweet)	
 	return tweet
