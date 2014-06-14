@@ -36,8 +36,9 @@ class SentimentClassifier(object):
 		self.classifier = pickle.load(open(file_name))
 		return self
 
-	def default_filename(self):
-		return "./serialized_classifiers/" + self.name + "-Classifier-default.pkl"
+	@classmethod
+	def default_filename(cls):
+		return "./serialized_classifiers/" + cls.__name__ + "-default.pkl"
 
 	def classify_tweet(self, tweet, verbose=False):
 		features = filtered_bag_of_words(wordpunct_tokenize(preprocessTweet(tweet)))
@@ -54,7 +55,6 @@ class NBSentimentClassifier(SentimentClassifier):
 	""" Naive Bayes Sentiment Classifier """
 	def __init__(self):
 		super(NBSentimentClassifier, self).__init__()
-		self.name = "NaiveBayes"
 		self.classifier = NaiveBayesClassifier		
 
 
@@ -62,9 +62,6 @@ class MaxEntSentimentClassifier(SentimentClassifier):
 	""" Maximum Entropy Sentiment Classifier """
 	def __init__(self):
 		super(MaxEntSentimentClassifier, self).__init__()
-		self.name = "MaxEnt"
-		self.classifier = None
 
-	def train(self, training_set):
-		self.classifier = SklearnClassifier(LogisticRegression()).train(training_set)
-		return self
+		self.classifier = SklearnClassifier(LogisticRegression())
+
