@@ -11,7 +11,7 @@ class CSVJob(Job):
 
 	def map(self, row, params):
 		if self.keyword.lower() in row[5].lower():
-			yield row[1],row[1:]
+			yield row[1],row[0:]
 
 	@staticmethod
 	def map_reader(fd, size, url, params):
