@@ -73,9 +73,26 @@ Für diese Idee wird eine grosse Menge von Tweets über einen längeren Zeitraum
 
 \section{Twitter Korpus}
 genügend Tweets um Klassifizierer zu trainieren, historischer verlauf
+Twitter stellt für Entwickler eine moderne API (Application Programm Interface) zur Verfügung. Die aktuell version dieser API (Version 1.1) erlaubt dem Benutzer nach Tweets zu suchen oder die Timeline eines Benutzers anzuschauen. Die Menge von Tweets die bei solch einer Suche zurückgegeben wird, ist jedoch stark begrenzt. Pro Suche können ca. 15 Seiten mit maximal 100 Tweets gefunden werden\footnote{https://dev.twitter.com/docs/api/1/get/search}. Bei durchschnittlich 5700 Tweets pro Sekunde\footnote{https://blog.twitter.com/2013/new-tweets-per-second-record-and-how} ist diese eine sehr geringe Menge. Dieser durchschnitt bezieht sich auf das Jahr 2013 und wird im Jahr 2014 sicherlich steigen.
+Dadurch ist die Beschaffung von einer grossen Menge Tweets über die API nicht möglich. Als alternative gibt es Twitter Korpusse welche eine grosse Menge an Tweets beinhalten. 
+\newline{}
+Auf der Suche nach einem geeigneten Twitter korpus, für unsere Sentiment Analyse, wurden wir fündig auf www.sentiment140.com. Die Entwickler von sentiment140 haben eine Twitter Sentiment Analyse erfolgreich entwickelt und stellen ein Teil ihrer Testdaten zur Verfügung. Der Korpus beinhaltet 1,6 Millionen Tweets in einer CSV Datei und hat folgende 6 Datenfelder:
+\begin{enumerate}
+\item Polarität (0 = negativ, 2 = neutral, 4 = positiv)
+\item ID des Tweets
+\item Datum
+\item Die Suchabfrage mit der der Tweet gefunden wurde
+\item Benutzer welcher der Tweet geschrieben hat
+\item Text des Tweets
+\end{enumerate}
+Obwohl wir unsere eigene Sentiment Analyse implementieren benötigen wir die Polarität, weil dadurch unsere eigener Klassifizierungs Algorithmen trainiert werden. Mehr dazu weiter unten. 
 
 \section{Paralleles Rechnen}
-kein cluster, nur ein rechner mit je ein core pro worker
+Für die Parallellisierung benutzen wir ein Python Framework. Für unsere Sentiment Analyse wird kein Cluster verwendet sondern mehrere worker Prozesse welche auf dem Rechner parallel ausgeführt werden. Zur Auswahl standen zwei Frameworks das Disco mit dem Map Reduce verfahren und das MPI (Message Passing Interface). 
+
+lokalitäts Prinzip Mapreduce params wird sterilisiert. kein klassifizieret angeben
+
+kein cluster, nur ein rechner mit je ein  core pro worker
 worker müssen trainierten classifier deserialisieren $\Rightarrow$ besser nicht über netzwerk
 \subsection{Evaluation MapReduce vs. MPI}
 

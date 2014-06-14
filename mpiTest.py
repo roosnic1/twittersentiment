@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Usage:  mpirun -n 4 python mpiTest.py 
+# Usage:  mpirun -n 4 python mpiTest.py
 
 from classifiers import MaxEntSentimentClassifier, NBSentimentClassifier
 from classifier_utils import *
+import sys
+from datetime import datetime
 from mpi4py import MPI
+import operator
+
 
 
 def chunked(alist, num_chunks):
@@ -13,6 +17,11 @@ def chunked(alist, num_chunks):
 	slice_len = len(alist)/num_chunks
 	for x in xrange(0, num_chunks):
 		yield alist[x*slice_len:(x+1)*slice_len]
+
+def combine_dicts(a, b, op=None):
+    op = op or (lambda x, y: x + y)
+    return dict(a.items() + b.items() +
+        [(k, op(a[k], b[k])) for k in set(b) & set(a)])
 
 
 comm = MPI.COMM_WORLD
@@ -23,7 +32,12 @@ classifier = NBSentimentClassifier().load_model()
 
 
 if(rank == 0):
-	tweetlist = loadTwitterCSV('trainingandtestdata/testdata.csv')
+	if len(sys.argv) > 1:
+		csvFile = sys.argv[1]
+	else:
+		csvFile = 'trainingandtestdata/testdata.csv'
+
+	tweetlist = loadTwitterCSV(csvFile)
 	#tweetlist = loadTwitterCSV('trainingandtestdata/training.1600000.processed.noemoticon.csv')
 	tweetlist = chunked(tweetlist, size)
 else:
@@ -32,13 +46,35 @@ else:
 tweetlist_chunk = comm.scatter(tweetlist, root=0)
 #print rank, 'has data:', tweetlist_chunk
 
-sentiments = []
+sentiments = {}
 for tweet in tweetlist_chunk:
 	sentiment = classifier.classify_tweet(tweet['text'])
-	sentiments.append([tweet['id'],tweet['date'],sentiment])
+	tweetDate = tweet['date'].replace('PDT ','')
+	tweetDate = tweetDate.replace('UTC ','')
+	tweetDate = tweetDate.replace('GMT ','')
+	date = datetime.strptime(tweetDate, '%a %b %d %H:%M:%S %Y')
+	dayDate = date.strftime('%Y%m%d')
+
+	if sentiment == 'pos':
+		sentimentValue = 1
+	else:
+		sentimentValue = -1
+
+	if not dayDate in sentiments:
+		sentiments[dayDate] = sentimentValue
+	else:
+		sentiments[dayDate] += sentimentValue
+
+	#sentiments.append([tweet['id'],dayDate,sentimentValue])
+
+
 
 chunked_sentiments = comm.gather(sentiments, root=0)
 
 if rank == 0:
+	A = {}
 	for sentiments in chunked_sentiments:
-		print len(sentiments)
+		A = combine_dicts(A,sentiments,operator.add)
+
+	print A
+	print len(sentiments)
