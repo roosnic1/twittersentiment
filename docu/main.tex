@@ -12,6 +12,7 @@
 \usepackage[T1]{fontenc} % ermöglicht die Silbentrennung von Wörtern mit Umlauten
 \usepackage[bookmarksnumbered, bookmarksopen=true]{hyperref}  % PDF wird mit Lesezeichen (verlinktes Inhaltsverzeichnis) versehen 
 
+\usepackage{listings} 
 %\usepackage{fancyhdr}
 %\pagestyle{fancy}
 
@@ -37,7 +38,7 @@
 
 
 \begin{document}
-
+\lstset{language=Python} 
 \newcommand{\qem}[1]{\emph{"<#1">}} % quotated emphasize
 
 \maketitle
@@ -103,8 +104,11 @@ worker müssen trainierten classifier deserialisieren $\Rightarrow$ besser nicht
 \subsubsection{Disco - MapReduce}
 Disco ist ein leichtes, Open-Source Framework dass das Map Reduce Programmiermodell, welches ursprünglich von Google entwickelt wurde\footnote{\textsc{Dean}, Jeffrey und \textsc{Ghemawat}, Sanjay: MapReduce: Simplified Data Processing on Large Clusters. In: Sixth Symposium on Operating System Design and Implementation, San Francisco 2004.}, anbietet. Für die Installation wird eine Linux/Unix Distribution oder ein Mac OS X System, einen SSH Daemon und Client, Erlang/OTP R14A oder neuer und Python 2.6.6 oder neuer benötigt. Für die Webdarstellung wird entweder Lighttpd 1.4.17 oder neuer oder Varnish 2.1.3 oder neuer benötigt. Disco kann auf dem Mac OS X mit Homebrew\footnote{Packet Manager für Mac OS X} installiert werden. Alternativ kann man auch den Source Code herunterladen und Disco selbständig kompilieren. Nach der installation braucht es noch einige kleinere Konfiguration bis Disco funktionsfähig ist. Ab jetzt kann mit Eingabedateien (Textdateien, CSV Dateien) und 2 Funktionen, Map und Reduce, das Framework benutz werden.
 \subsubsection{MPI for Python - Message Passing Interface}
-Beide Frameworks haben ihre Vor- und Nachteile. Das Disco Framework mit dem Map Reduce verfahren hat von Anfang an einen guten und einfach Eindruck hinterlassen. Nach der Installation des Framworks werden legendlich Inputdaten sowie 2 Funktionen benötigt um das Framwork zu benutzen. \newline{}
-
+Das Message Passing Interface (MPI) ist ein Standard, welcher den Nachrichtenaustausch bei parallelen Berechnungen auf verteilten Computersystem beschreibt. Das MPI for Python Packte wurde auf den MPI-1/MPI2 Spezifikationen aufgebaut und bietet eine Objekt orientierte Schnittstelle an. Für die Installation von MPI for Python wird eine funktionierende MPI Distribution benötigt und Python 2.3 oder neuer. Die Installation ist relative einfach mit PIP\footnote{Installationsprogramm für Python-Pakete} auszuführen. Im Python Script wird die MPI Bibliothek importiert und die Scrips werden mit
+\begin{lstlisting}
+$ mpirun -n 5 python demo/helloworld.py
+\end{lstlisting}
+gestartet.\newline{}
 %Noch nicht sicher ob das hierher gehört.
 Wir haben uns für das Disco Framework entscheiden wegen der sehr einfachen Handhabung. Bei der Implementation der parallelen Sentiment Analyse haben wir jedoch bemerkt dass das Disco Framework Probleme hat beim Serialisieren und Deserialisieren des Klassifizierungsalgorithmus. Daher haben wir für die parallelisierung des Sentiment Analyse das MPI Framework verwendet.
 
