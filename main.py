@@ -5,6 +5,7 @@ import csv
 import subprocess
 import shutil
 import datetime
+import matplotlib.pyplot as plt
 
 from disco.core import result_iterator
 from discoFilter import CSVJob
@@ -60,58 +61,58 @@ def executeTest():
 
 	start = datetime.datetime.now()
 	filteredCSV = cwd + '/tmp/test1001.csv'
-	executeFilter('',cwd+'/testsplit/*',filteredCSV)
+	executeFilter('apple',cwd+'/testsplit/*',filteredCSV)
 	executeSentiment('mpiTest.py',4,filteredCSV,True)
 	end = datetime.datetime.now()
 	d = end - start
-	parallelTimes.append((1000,d.total_seconds()))
+	parallelTimes.append((d.total_seconds(),1000))
 
 	createTestData(50,cwd+'/testcorpus/split1000aa',cwd+'/testsplit')
 
 	start = datetime.datetime.now()
 	filteredCSV = cwd + '/tmp/test1001.csv'
-	executeFilter('',cwd+'/testsplit/*',filteredCSV)
+	executeFilter('apple',cwd+'/testsplit/*',filteredCSV)
 	executeSentiment('mpiTest.py',8,filteredCSV,True)
 	end = datetime.datetime.now()
 	d = end - start
-	parallelTimes2.append((1000,d.total_seconds()))
+	parallelTimes2.append((d.total_seconds(),1000))
 
 	start = datetime.datetime.now()
 	filteredCSV = cwd + '/tmp/test1002.csv'
-	executeFilter('',cwd+'/testcorpus/split1000aa',filteredCSV)
+	executeFilter('apple',cwd+'/testcorpus/split1000aa',filteredCSV)
 	executeSentiment('mpiTest.py',1,filteredCSV,True)
 	end = datetime.datetime.now()
 	d = end - start
-	serialTimes.append((1000,d.total_seconds()))
+	serialTimes.append((d.total_seconds(),1000))
 
 	#SecondTest
 	createTestData(1000,cwd+'/testcorpus/split10000aa',cwd+'/testsplit')
 
 	start = datetime.datetime.now()
 	filteredCSV = cwd + '/tmp/test10001.csv'
-	executeFilter('',cwd+'/testsplit/*',filteredCSV)
+	executeFilter('apple',cwd+'/testsplit/*',filteredCSV)
 	executeSentiment('mpiTest.py',4,filteredCSV,True)
 	end = datetime.datetime.now()
 	d = end - start
-	parallelTimes.append((10000,d.total_seconds()))
+	parallelTimes.append((d.total_seconds(),10000))
 
 	createTestData(500,cwd+'/testcorpus/split10000aa',cwd+'/testsplit')
 
 	start = datetime.datetime.now()
 	filteredCSV = cwd + '/tmp/test10001.csv'
-	executeFilter('',cwd+'/testsplit/*',filteredCSV)
+	executeFilter('apple',cwd+'/testsplit/*',filteredCSV)
 	executeSentiment('mpiTest.py',8,filteredCSV,True)
 	end = datetime.datetime.now()
 	d = end - start
-	parallelTimes2.append((10000,d.total_seconds()))
+	parallelTimes2.append((d.total_seconds(),10000))
 
 	start = datetime.datetime.now()
 	filteredCSV = cwd + '/tmp/test10002.csv'
-	executeFilter('',cwd+'/testcorpus/split10000aa',filteredCSV)
+	executeFilter('apple',cwd+'/testcorpus/split10000aa',filteredCSV)
 	executeSentiment('mpiTest.py',1,filteredCSV,True)
 	end = datetime.datetime.now()
 	d = end - start
-	serialTimes.append((10000,d.total_seconds()))
+	serialTimes.append((d.total_seconds(),10000))
 
 
 	#ThirdTest
@@ -119,58 +120,58 @@ def executeTest():
 
 	start = datetime.datetime.now()
 	filteredCSV = cwd + '/tmp/test100001.csv'
-	executeFilter('',cwd+'/testsplit/*',filteredCSV)
+	executeFilter('apple',cwd+'/testsplit/*',filteredCSV)
 	executeSentiment('mpiTest.py',4,filteredCSV,True)
 	end = datetime.datetime.now()
 	d = end - start
-	parallelTimes.append((100000,d.total_seconds()))
+	parallelTimes.append((d.total_seconds(),100000))
 
 	createTestData(5000,cwd+'/testcorpus/split100000aa',cwd+'/testsplit')
 
 	start = datetime.datetime.now()
 	filteredCSV = cwd + '/tmp/test100001.csv'
-	executeFilter('',cwd+'/testsplit/*',filteredCSV)
+	executeFilter('apple',cwd+'/testsplit/*',filteredCSV)
 	executeSentiment('mpiTest.py',8,filteredCSV,True)
 	end = datetime.datetime.now()
 	d = end - start
-	parallelTimes2.append((100000,d.total_seconds()))
+	parallelTimes2.append((d.total_seconds(),100000))
 
 	start = datetime.datetime.now()
 	filteredCSV = cwd + '/tmp/test100002.csv'
-	executeFilter('',cwd+'/testcorpus/split100000aa',filteredCSV)
+	executeFilter('apple',cwd+'/testcorpus/split100000aa',filteredCSV)
 	executeSentiment('mpiTest.py',1,filteredCSV,True)
 	end = datetime.datetime.now()
 	d = end - start
-	serialTimes.append((100000,d.total_seconds()))
+	serialTimes.append((d.total_seconds(),100000))
 
 	#FourthTest
 	createTestData(100000,cwd+'/testcorpus/split1000000aa',cwd+'/testsplit')
 
 	start = datetime.datetime.now()
 	filteredCSV = cwd + '/tmp/test1000001.csv'
-	executeFilter('',cwd+'/testsplit/*',filteredCSV)
+	executeFilter('apple',cwd+'/testsplit/*',filteredCSV)
 	executeSentiment('mpiTest.py',4,filteredCSV,True)
 	end = datetime.datetime.now()
 	d = end - start
-	parallelTimes.append((1000000,d.total_seconds()))
+	parallelTimes.append((d.total_seconds(),1000000))
 
 	createTestData(50000,cwd+'/testcorpus/split1000000aa',cwd+'/testsplit')
 
 	start = datetime.datetime.now()
 	filteredCSV = cwd + '/tmp/test1000001.csv'
-	executeFilter('',cwd+'/testsplit/*',filteredCSV)
+	executeFilter('apple',cwd+'/testsplit/*',filteredCSV)
 	executeSentiment('mpiTest.py',8,filteredCSV,True)
 	end = datetime.datetime.now()
 	d = end - start
-	parallelTimes2.append((1000000,d.total_seconds()))
+	parallelTimes2.append((d.total_seconds(),1000000))
 
 	start = datetime.datetime.now()
 	filteredCSV = cwd + '/tmp/test1000002.csv'
-	executeFilter('',cwd+'/testcorpus/split1000000aa',filteredCSV)
+	executeFilter('apple',cwd+'/testcorpus/split1000000aa',filteredCSV)
 	executeSentiment('mpiTest.py',1,filteredCSV,True)
 	end = datetime.datetime.now()
 	d = end - start
-	serialTimes.append((1000000,d.total_seconds()))
+	serialTimes.append((d.total_seconds(),1000000))
 
 	print 'Fitler: 10 workers, MPI: 4 workers'
 	print parallelTimes
@@ -179,6 +180,24 @@ def executeTest():
 	print 'Filter: 1 worker, MPI: 1 worker'
 	print serialTimes
 
+	#Plotting
+	x_val = [x[1] for x in parallelTimes]
+	y_val = [x[0] for x in parallelTimes]
+	plt.plot(x_val,y_val,'b-',label='Parallel *10')
+
+	x_val = [x[1] for x in parallelTimes2]
+	y_val = [x[0] for x in parallelTimes2]
+	plt.plot(x_val,y_val,'g--',label='Parallel *20')
+
+	x_val = [x[1] for x in serialTimes]
+	y_val = [x[0] for x in serialTimes]
+	plt.plot(x_val,y_val,'r-.',label='Serial')
+	#plt.plot(parallelTimes2)
+	#plt.plot(serialTimes)
+	plt.xlabel('#number of tweets')
+	plt.ylabel('time')
+	plt.title('Parallel vs. Serial ("apple")')
+	plt.show()
 
 
 
