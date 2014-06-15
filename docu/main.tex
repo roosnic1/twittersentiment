@@ -9,6 +9,8 @@
 \usepackage{amssymb}
 \usepackage[utf8]{inputenc}
 \usepackage[german]{babel}
+\usepackage[T1]{fontenc} % ermöglicht die Silbentrennung von Wörtern mit Umlauten
+\usepackage[bookmarksnumbered, bookmarksopen=true]{hyperref}  % PDF wird mit Lesezeichen (verlinktes Inhaltsverzeichnis) versehen 
 
 %\usepackage{fancyhdr}
 %\pagestyle{fancy}
@@ -35,6 +37,9 @@
 
 
 \begin{document}
+
+\newcommand{\qem}[1]{\emph{"<#1">}} % quotated emphasize
+
 \maketitle
 
 
@@ -106,12 +111,38 @@ Wir haben uns für das Disco Framework entscheiden wegen der sehr einfachen Hand
 \chapter{Umsetzung}
 
 \section{Sentiment Analyse}
-\subsection{Klassifikation}
-\subsubsection{Naive Bayes}
+Die Sentiment Analyse ist ein Verfahren des \emph{Natural Language Processing}, einem interdisziplinären Forschungsgebiet aus Informatik und Linguistik.
+Es geht im wesentlichen darum, die in einem Text vorherrschende Stimmung automatisiert zu bestimmen. 
+Der zu untersuchende Text kann, wie in unserem Fall mit Tweets, aus nur einzelnen wenigen Sätzen bestehen, welche einer der beiden Klassen mit eher "<positiver"> oder "<negativer"> Stimmung zugeteilt werden.
+Dafür verwendet man einen geeigneten Klassifikator, welchen  mit einer Trainingsmenge trainiert wird, um anschliessend die Klassifikation durchzuführen. 
+
+Wir verwenden für diese Arbeit einen Naive-Bayes-Klassifikator sowie einen Maximum-Entropy-Klassifikator, zwei bekannte Klassifikationsalgorithmen des \emph{Machine Learning}, und vergleichen deren Leistung.
+
+
+\subsection{Trainingsmenge}
+Das Trainings-Set ist nach dem \emph{Bag of words model} aufgebaut.
+
+\subsection{Klassifikationsalgorithmen}
+\subsubsection{Naive-Bayes}
+
+Der Naive-Bayes-Klassifikator macht sich die Wahrschentlichkeitsverteilung der Klassen und Features im Trainings-Set, sowie die Anwendung des Bayes-Theorem (Satz von Bayes) zunutze.
+
+$$
+P(C \vert F_1,\dots,F_n) = \frac{P(C) \ P(F_1,\dots,F_n\vert C)}{P(F_1,\dots,F_n)}. \,
+$$
+
+
+In unserer Implementation verwenden wir die Klasse\\
+ \verb|nltk.classify.NaiveBayesClassifier| des NLTK-Frameworks
+
 \subsubsection{MaxEnt}
+In unserer Implementation verwenden wir die Klasse\\
+\verb|nltk.classify.scikitlearn.SklearnClassifier| zusammen mit\\
+\verb|sklearn.linear_model.LogisticRegression| des scikit-learn Frameworks.
+
 \subsection{Tweet Preprocessing}
 @User, Hashtags, URLs, Retweets (RT), html entities
-tokenizer
+nltk-tokenizer
 
 \section{Filtern mit MapReduce}
 
