@@ -73,7 +73,7 @@ Für diese Idee wird eine grosse Menge von Tweets über einen längeren Zeitraum
 
 \section{Twitter Korpus}
 genügend Tweets um Klassifizierer zu trainieren, historischer verlauf
-Twitter stellt für Entwickler eine moderne API (Application Programm Interface) zur Verfügung. Die aktuell version dieser API (Version 1.1) erlaubt dem Benutzer nach Tweets zu suchen oder die Timeline eines Benutzers anzuschauen. Die Menge von Tweets die bei solch einer Suche zurückgegeben wird, ist jedoch stark begrenzt. Pro Suche können ca. 15 Seiten mit maximal 100 Tweets gefunden werden\footnote{https://dev.twitter.com/docs/api/1/get/search}. Bei durchschnittlich 5700 Tweets pro Sekunde\footnote{https://blog.twitter.com/2013/new-tweets-per-second-record-and-how} ist diese eine sehr geringe Menge. Dieser durchschnitt bezieht sich auf das Jahr 2013 und wird im Jahr 2014 sicherlich steigen.
+Twitter stellt für Entwickler eine moderne API (Application Programm Interface) zur Verfügung. Die aktuell version dieser API (Version 1.1) erlaubt dem Benutzer nach Tweets zu suchen oder die Timeline eines Benutzers anzuschauen. Die Menge von Tweets die bei solch einer Suche zurückgegeben wird, ist jedoch stark begrenzt. Pro Suche können ca. 15 Seiten mit maximal 100 Tweets gefunden werden\footnote{GET search. https://dev.twitter.com/docs/api/1/get/search. Zuletzt aufgerufen am 14.06.2014.}. Bei durchschnittlich 5700 Tweets pro Sekunde\footnote{New Tweets per second record, and how. https://blog.twitter.com/2013/new-tweets-per-second-record-and-how. Zuletzt aufgerufen am 14.06.2014} ist diese eine sehr geringe Menge. Dieser durchschnitt bezieht sich auf das Jahr 2013 und wird im Jahr 2014 sicherlich steigen.
 Dadurch ist die Beschaffung von einer grossen Menge Tweets über die API nicht möglich. Als alternative gibt es Twitter Korpusse welche eine grosse Menge an Tweets beinhalten. 
 \newline{}
 Auf der Suche nach einem geeigneten Twitter korpus, für unsere Sentiment Analyse, wurden wir fündig auf www.sentiment140.com. Die Entwickler von sentiment140 haben eine Twitter Sentiment Analyse erfolgreich entwickelt und stellen ein Teil ihrer Testdaten zur Verfügung. Der Korpus beinhaltet 1,6 Millionen Tweets in einer CSV Datei und hat folgende 6 Datenfelder:
@@ -88,13 +88,20 @@ Auf der Suche nach einem geeigneten Twitter korpus, für unsere Sentiment Analys
 Obwohl wir unsere eigene Sentiment Analyse implementieren benötigen wir die Polarität, weil dadurch unsere eigener Klassifizierungs Algorithmen trainiert werden. Mehr dazu weiter unten. 
 
 \section{Paralleles Rechnen}
-Für die Parallellisierung benutzen wir ein Python Framework. Für unsere Sentiment Analyse wird kein Cluster verwendet sondern mehrere worker Prozesse welche auf dem Rechner parallel ausgeführt werden. Zur Auswahl standen zwei Frameworks das Disco mit dem Map Reduce verfahren und das MPI (Message Passing Interface). 
+Für die Parallellisierung wurde ein Python Framework benutzt. Für die Sentiment Analyse wird kein Cluster verwendet sondern mehrere Worker Prozesse welche auf dem Rechner parallel ausgeführt werden. Ein Grund dafür war dass die Klassifizierungs Algorithmen trainiert werden müssen um zu funktionieren. Diese Trainingsdaten über das Netzwerk auszurauschen, würden in unserem Fall zu einer Verlangsamung führen. %Mehr???
+Zur Auswahl standen 2 Python Bibliotheken. Zum einen das Disco Framwork mit dem Map Reduce verfahren. Zum andern das  MPI for Python Framework mit dem Message Passing Interface verfahren.
 
 lokalitäts Prinzip Mapreduce params wird sterilisiert. kein klassifizieret angeben
 
-kein cluster, nur ein rechner mit je ein  core pro worker
 worker müssen trainierten classifier deserialisieren $\Rightarrow$ besser nicht über netzwerk
 \subsection{Evaluation MapReduce vs. MPI}
+\subsubsection{Disco - MapReduce}
+Disco ist ein leichtes, Open-Source Framework dass das Map Reduce Programmiermodell, welches ursprünglich von Google entwickelt wurde\footnote{\textsc{Dean}, Jeffrey und \textsc{Ghemawat}, Sanjay: MapReduce: Simplified Data Processing on Large Clusters. In: Sixth Symposium on Operating System Design and Implementation, San Francisco 2004.}, anbietet. Für die Installation wird eine Linux/Unix Distribution oder ein Mac OS X System, einen SSH Daemon und Client, Erlang/OTP R14A oder neuer und Python 2.6.6 oder neuer benötigt. Für die Webdarstellung wird entweder Lighttpd 1.4.17 oder neuer oder Varnish 2.1.3 oder neuer benötigt. Disco kann auf dem Mac OS X mit Homebrew\footnote{Packet Manager für Mac OS X} installiert werden. Alternativ kann man auch den Source Code herunterladen und Disco selbständig kompilieren. Nach der installation braucht es noch einige kleinere Konfiguration bis Disco funktionsfähig ist. Ab jetzt kann mit Eingabedateien (Textdateien, CSV Dateien) und 2 Funktionen, Map und Reduce, das Framework benutz werden.
+\subsubsection{MPI for Python - Message Passing Interface}
+Beide Frameworks haben ihre Vor- und Nachteile. Das Disco Framework mit dem Map Reduce verfahren hat von Anfang an einen guten und einfach Eindruck hinterlassen. Nach der Installation des Framworks werden legendlich Inputdaten sowie 2 Funktionen benötigt um das Framwork zu benutzen. \newline{}
+
+%Noch nicht sicher ob das hierher gehört.
+Wir haben uns für das Disco Framework entscheiden wegen der sehr einfachen Handhabung. Bei der Implementation der parallelen Sentiment Analyse haben wir jedoch bemerkt dass das Disco Framework Probleme hat beim Serialisieren und Deserialisieren des Klassifizierungsalgorithmus. Daher haben wir für die parallelisierung des Sentiment Analyse das MPI Framework verwendet.
 
 \chapter{Umsetzung}
 
@@ -106,7 +113,9 @@ worker müssen trainierten classifier deserialisieren $\Rightarrow$ besser nicht
 @User, Hashtags, URLs, Retweets (RT), html entities
 tokenizer
 
-\section{MapReduce}
+\section{Filtern mit MapReduce}
+
+\section{Parallele Sentiment Analyse}
 
 \section{GUI}
 
