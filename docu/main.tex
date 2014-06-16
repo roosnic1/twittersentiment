@@ -94,7 +94,7 @@ Auf der Suche nach einem geeigneten Twitter korpus, für unsere Sentiment Analys
 Obwohl wir unsere eigene Sentiment Analyse implementieren benötigen wir die Polarität, weil dadurch unsere eigener Klassifizierungs Algorithmen trainiert werden. Mehr dazu weiter unten. 
 
 \section{Paralleles Rechnen}
-Für die Parallellisierung wurde ein Python Framework benutzt. Für die Sentiment Analyse wird kein Cluster verwendet sondern mehrere Worker Prozesse welche auf dem Rechner parallel ausgeführt werden. Ein Grund dafür war dass die Klassifizierungs Algorithmen trainiert werden müssen um zu funktionieren. Diese Trainingsdaten über das Netzwerk auszurauschen, würden in unserem Fall zu einer Verlangsamung führen. %Mehr???
+Für die Parallellisierung wurde ein Python Framework benutzt. Für die Sentiment Analyse wird kein Cluster verwendet sondern mehrere Worker Prozesse welche auf dem Rechner parallel ausgeführt werden. Ein Grund dafür war dass die Klassifizierungs Algorithmen trainiert werden müssen um richtig zu funktionieren. Diese Trainingsdaten über das Netzwerk auszurauschen, würden in unserem Fall zu einer Verlangsamung führen. %Mehr???
 Zur Auswahl standen 2 Python Bibliotheken. Zum einen das Disco Framwork mit dem Map Reduce verfahren. Zum andern das  MPI for Python Framework mit dem Message Passing Interface verfahren.
 
 lokalitäts Prinzip Mapreduce params wird sterilisiert. kein klassifizieret angeben
@@ -110,7 +110,7 @@ $ mpirun -n 5 python demo/helloworld.py
 \end{lstlisting}
 gestartet.\newline{}
 %Noch nicht sicher ob das hierher gehört.
-Wir haben uns für das Disco Framework entscheiden wegen der sehr einfachen Handhabung. Bei der Implementation der parallelen Sentiment Analyse haben wir jedoch bemerkt dass das Disco Framework Probleme hat beim Serialisieren und Deserialisieren des Klassifizierungsalgorithmus. Daher haben wir für die parallelisierung des Sentiment Analyse das MPI Framework verwendet.
+Wir haben uns für das Disco Framework entschieden wegen der sehr einfachen Handhabung. Bei der Implementation der parallelen Sentiment Analyse haben wir jedoch bemerkt dass das Disco Framework Probleme hat beim Serialisieren und Deserialisieren des Klassifizierungsalgorithmus. Daher haben wir für die parallelisierung des Sentiment Analyse das MPI Framework verwendet.
 
 \chapter{Umsetzung}
 
@@ -189,15 +189,56 @@ Für jeden Tweet wird das Datum in ein \emph{datetime} Objekt umgewandelt und au
 
 
 \section{Performancevergleich}
+Für die Performancetests wurde ein MacBook Pro, Late 2013 mit folgenden Komponenten verwendet:
+\begin{description}
+\item[ Prozessor] 2.6 GHz Intel Core i7
+\item[ Arbeitsspeicher] 16 GB 1600 MHz DDR3
+\item[ Betriebsystem] OS X 10.9.3
+\item[ Python] Version 2.7.7
+\item[ Disco ] Version 0.5-56-g136b1ac
+\item[ MPI ] Version 3.1
+\end{description}
 
+\subsection{Sentiment Analyse}
+Es ist sehr schnell ersichtlich dass die parallele Ausführung der Sentiment Funktion bedeutend Schneller ist. In Abbildung 4.4 sieht man 4 parallele Jobs (4,6,7 und 8 Workers) und einen seriellen Job. Der schnellste parallele Job braucht für 1'000'000 Tweets 38.9 Sekunden und der serielle Job benötigt für dieselbe Menge 110.2 Sekunden.
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=0.9\textwidth]{bilder/time_senitment_par-ser.pdf}
+\includegraphics[width=0.75\textwidth]{bilder/time_senitment_par-ser.pdf}
+\caption{Sentiment Analyse (par vs ser)}
+\label{img:performancesentiment}
+\end{center}
+\end{figure}
+%Fitler: 10 workers, MPI: 4 workers
+%[(0.708772, 1000), (1.070244, 10000), (4.545117, 100000), (40.366181, 1000000)]
+%Fitler: 10 workers, MPI: 6 workers
+%[(0.95488, 1000), (1.224783, 10000), (4.383731, 100000), (38.915281, 1000000)]
+%Fitler: 10 workers, MPI: 7 workers
+%[(1.024954, 1000), (1.296836, 10000), (4.558475, 100000), (40.077041, 1000000)]
+%Filter: 20 workers, MPI: 8 workers
+%[(1.124848, 1000), (1.523185, 10000), (4.824918, 100000), (41.11099, 1000000)]
+%Filter: 1 worker, MPI: 1 worker
+%[(0.673428, 1000), (1.669188, 10000), (11.060885, 100000), (110.175096, 1000000)]
+
+Das ändern der Anzahl Worker hat keinen merkbaren Einfluss auf die Ausführungsgeschwindigkeit der Sentiment Analyse. Es war anzunehmen dass mit 6 Workern eine schneller Ausführung erreicht werden kann, weil die 2 restlichen Prozessorenkerne den overhead kompensieren könnten. Dies war aber nicht der Fall.
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.75\textwidth]{bilder/time_senitment_par.pdf}
 \caption{Sentiment Analyse}
 \label{img:performancesentiment}
 \end{center}
 \end{figure}
 
+%Fitler: 10 workers, MPI: 4 workers
+%[(0.730369, 1000), (1.027004, 10000), (4.103374, 100000), (38.110437, 1000000)]
+%Fitler: 10 workers, MPI: 6 workers
+%[(0.963817, 1000), (1.177442, 10000), (4.331552, 100000), (38.666975, 1000000)]
+%Fitler: 10 workers, MPI: 7 workers
+%[(1.021573, 1000), (1.316651, 10000), (4.289592, 100000), (41.529118, 1000000)]
+%Filter: 20 workers, MPI: 8 workers
+%[(1.112133, 1000), (1.406023, 10000), (4.5955, 100000), (40.263055, 1000000)]
+
+\subsection{Tweets Filtern}
+Abbildung 4.6 und 4.7 zeigen dass die Wahl des Keywords keinen Einfluss auf die Geschwindigkeit der Funktion haben. Die parallelisierung der Filter Funktion zeigt eine signifikante Verbesserung des Jobs.
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=0.9\textwidth]{bilder/time_filter_apple.pdf}
@@ -208,20 +249,11 @@ Für jeden Tweet wird das Datum in ein \emph{datetime} Objekt umgewandelt und au
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=0.9\textwidth]{bilder/time_filter_google.pdf}
-\caption{Performance keyword 'google'}
-\label{img:performancefilter2}
-\end{center}
-\end{figure}
-
-\begin{figure}[htbp]
-\begin{center}
 \includegraphics[width=0.9\textwidth]{bilder/time_filter_obama.pdf}
 \caption{Performance keyword 'obama'}
 \label{img:performancefilter3}
 \end{center}
 \end{figure}
-
 
 
 \section{Plot Stimmungsverlauf}
