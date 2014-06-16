@@ -81,18 +81,18 @@ Für diese Idee wird eine grosse Menge von Tweets über einen längeren Zeitraum
 \chapter{Anforderungen}
 
 \section{Twitter Korpus}
-Twitter stellt für Entwickler eine moderne API\footnote{Application Programming Interface} zur Verfügung. Die aktuell version dieser API, Version 1.1, erlaubt dem Benutzer nach Tweets zu suchen oder die Timeline eines Benutzers auszugeben. Die Menge von Tweets die bei solch einer Suche zurückgegeben wird, ist jedoch stark begrenzt. Pro Suche können ca. 15 Seiten mit maximal 100 Tweets gefunden werden\footnote{GET search. https://dev.twitter.com/docs/api/1/get/search. Zuletzt aufgerufen am 14.06.2014.}. Bei durchschnittlich 5700 Tweets pro Sekunde\footnote{New Tweets per second record, and how. https://blog.twitter.com/2013/new-tweets-per-second-record-and-how. Zuletzt aufgerufen am 14.06.2014} ist diese eine sehr geringe Menge. Dieser durchschnitt bezieht sich auf das Jahr 2013 und wird im Jahr 2014 sicherlich steigen.
+Twitter stellt für Entwickler eine moderne API zur Verfügung. Die aktuell version dieser API, Version 1.1, erlaubt dem Benutzer nach Tweets zu suchen oder die Timeline eines Benutzers auszugeben. Die Menge von Tweets die bei solch einer Suche zurückgegeben wird, ist jedoch stark begrenzt. Pro Suche können ca. 15 Seiten mit maximal 100 Tweets gefunden werden\footnote{\url{https://dev.twitter.com/docs/api/1/get/search}}. Bei durchschnittlich 5700 Tweets pro Sekunde\footnote{\url{https://blog.twitter.com/2013/new-tweets-per-second-record-and-how}} ist diese eine sehr geringe Menge. Dieser durchschnitt bezieht sich auf das Jahr 2013 und wird im Jahr 2014 sicherlich steigen.
 Dadurch ist die Beschaffung von einer grossen Menge Tweets über diese API nicht möglich.
 
 Als alternative gibt es die komerzielle API von DataSift\footnote{\url{http://dev.datasift.com/docs}}, welche ihre Twitter-Daten vermarktet.
 
 \section{Paralleles Rechnen}
 Für die parallele Ausführung wird ein Python Framework benutzt. Für die Sentiment Analyse und das Filtern der Tweets wird kein Cluster verwendet sondern mehrere Worker Prozesse welche auf dem Rechner parallel ausgeführt werden. Ein Grund dafür ist dass die Klassifikationen Algorithmen trainiert werden müssen um richtig zu funktionieren. Diese Trainingsdaten über das Netzwerk auszutauschen, würden in unserem Fall zu einer Verlangsamung führen.
-Zur Auswahl standen 2 Python Frameworks. Zum einen das Disco Framework mit dem Map Reduce verfahren. Zum andern das  MPI for Python Framework mit dem Message Passing Interface verfahren.
+Zur Auswahl standen 2 Python Frameworks. Zum einen das Disco Framework mit dem Map Reduce verfahren. Zum andern das  MPI for Python Framework mit dem Message Passing Interface Verfahren.
 
 \subsection{Evaluation MapReduce vs. MPI}
 \subsubsection{Disco - MapReduce}
-Disco ist ein leichtes, Open-Source Framework dass das Map Reduce Programmiermodell, welches ursprünglich von Google entwickelt wurde\footnote{\textsc{Dean}, Jeffrey und \textsc{Ghemawat}, Sanjay: MapReduce: Simplified Data Processing on Large Clusters. In: Sixth Symposium on Operating System Design and Implementation, San Francisco 2004.}, anbietet. Für die Installation wird eine Linux/Unix Distribution oder ein Mac OS X System, einen SSH Daemon und Client, Erlang/OTP R14A oder neuer und Python 2.6.6 oder neuer benötigt. Für die Webdarstellung wird entweder Lighttpd 1.4.17 oder neuer oder Varnish 2.1.3 oder neuer benötigt. Disco kann auf dem Mac OS X mit Homebrew\footnote{Packet Manager für Mac OS X} installiert werden. Alternativ kann man auch den Source Code herunterladen und Disco selbständig kompilieren. Nach der installation braucht es noch einige kleinere Konfiguration bis Disco funktionsfähig ist. Danach kann mit Eingabedateien (Textdateien, CSV Dateien) und 2 Funktionen, Map und Reduce, das Framework erfolgreich benutz werden.
+Disco ist ein leichtes, Open-Source Framework dass das Map Reduce Programmiermodell, welches ursprünglich von Google entwickelt wurde\footnote{\cite{dean}}, anbietet. Für die Installation wird eine Linux/Unix Distribution oder ein Mac OS X System, einen SSH Daemon und Client, Erlang/OTP R14A oder neuer und Python 2.6.6 oder neuer benötigt. Für die Webdarstellung wird entweder Lighttpd 1.4.17 oder neuer oder Varnish 2.1.3 oder neuer benötigt. Disco kann auf dem Mac OS X mit Homebrew\footnote{Packet Manager für Mac OS X} installiert werden. Alternativ kann man auch den Source Code herunterladen und Disco selbständig kompilieren. Nach der installation braucht es noch einige kleinere Konfiguration bis Disco funktionsfähig ist. Danach kann mit Eingabedateien (Textdateien, CSV Dateien) und 2 Funktionen, Map und Reduce, das Framework erfolgreich benutz werden.
 \subsubsection{MPI for Python - Message Passing Interface}
 Das Message Passing Interface (MPI) ist ein Standard, welcher den Nachrichtenaustausch bei parallelen Berechnungen auf verteilten Computersystem beschreibt. Das MPI for Python Packte wurde auf den MPI-1/MPI2 Spezifikationen aufgebaut und bietet eine Objekt orientierte Schnittstelle an. Für die Installation von MPI for Python wird eine funktionierende MPI Distribution benötigt und Python 2.3 oder neuer. Die Installation ist relative einfach mit PIP\footnote{Installationsprogramm für Python-Pakete} auszuführen. Im Python Script wird die MPI Bibliothek importiert und die Scrips werden mit
 \begin{lstlisting}
@@ -347,12 +347,14 @@ Abbildung 4.6  zeigt dass die parallele Ausführung der Filter Funktion signifik
 \end{center}
 \end{figure}
 
-\newpage{}
+
+\clearpage
+
 \section{Plot Stimmungsverlauf}
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[width=0.7\textwidth]{bilder/moodPlotApple.pdf}
+\includegraphics[width=0.9\textwidth]{bilder/moodPlotApple.pdf}
 \caption{Stimmungsverlauf 'Apple'}
 \label{img:moodplot1}
 \end{center}
@@ -360,7 +362,7 @@ Abbildung 4.6  zeigt dass die parallele Ausführung der Filter Funktion signifik
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[width=0.7\textwidth]{bilder/moodPlotGoogle.pdf}
+\includegraphics[width=0.9\textwidth]{bilder/moodPlotGoogle.pdf}
 \caption{Stimmungsverlauf 'Google'}
 \label{img:moodplot2}
 \end{center}
@@ -368,28 +370,17 @@ Abbildung 4.6  zeigt dass die parallele Ausführung der Filter Funktion signifik
 
 
 \chapter{Fazit}
-Die Parallele Ausführung der Sentiment Analyse und des Filterns ist ab einer grossen Anzahl Tweets bedeutend Schneller. Bei unseren Tests war die parallele Ausführung beim Filtern immer um den Faktor 2 schneller als die serielle Ausführung. Es ist zu erwarten dass dieser Faktor bei einer grösseren Menge an Tweets bestehen bleibt. Interessant ist auch dass der Overhead bei der parallelen Ausführung bei 100'000 und weniger Tweets ca. genau soviel Zeit einnimmt wie die serielle Ausführung. \newline{}
-Bei der Sentiment Analyse ist schon bei weniger Tweets erkennbar dass die parallele Ausführung schneller ist. Bereits bei 100'00 Tweets dauert die serielle Ausführung bereits 2 mal so lange. Bei 1'000'000 Tweets braucht es schon fast 3 mal so lange. Es ist zu erwarten dass dieser Faktoren bei mehr Tweets zu nimmt.
+Die Parallele Ausführung der Sentiment Analyse und des Filterns ist ab einer grossen Anzahl Tweets bedeutend Schneller. Bei unseren Tests war die parallele Ausführung beim Filtern immer um den Faktor 2 schneller als die serielle Ausführung. Es ist zu erwarten dass dieser Faktor bei einer grösseren Menge an Tweets bestehen bleibt. Interessant ist auch dass der Overhead bei der parallelen Ausführung bei 100'000 und weniger Tweets ca. genau soviel Zeit einnimmt wie die serielle Ausführung.
 
-% Fitler: 10 workers, MPI: 4 workers
-%[(4.301783, 1000), (4.043133, 10000), (4.044184, 100000), (4.46258, 1000000)]
-%Filter: 1 worker, MPI: 1 worker
-%[(4.037695, 1000), (4.038852, 10000), (4.038983, 100000), (10.062303, 1000000)]
-
-%Fitler: 10 workers, MPI: 4 workers
-%[(0.708772, 1000), (1.070244, 10000), (4.545117, 100000), (40.366181, 1000000)]
-%Fitler: 10 workers, MPI: 6 workers
-%[(0.95488, 1000), (1.224783, 10000), (4.383731, 100000), (38.915281, 1000000)]
-%Fitler: 10 workers, MPI: 7 workers
-%[(1.024954, 1000), (1.296836, 10000), (4.558475, 100000), (40.077041, 1000000)]
-%Filter: 20 workers, MPI: 8 workers
-%[(1.124848, 1000), (1.523185, 10000), (4.824918, 100000), (41.11099, 1000000)]
-%Filter: 1 worker, MPI: 1 worker
-%[(0.673428, 1000), (1.669188, 10000), (11.060885, 100000), (110.175096, 1000000)]
+Bei der Sentiment Analyse ist schon bei weniger Tweets erkennbar dass die parallele Ausführung schneller ist. Bereits bei 100'00 Tweets dauert die serielle Ausführung bereits 2 mal so lange. Bei 1'000'000 Tweets braucht es schon fast 3 mal so lange. Es ist zu erwarten dass dieser Faktoren bei mehr Tweets zu nimmt.\\
 
 
 Der Naive-Bayes-Klassifikator ist dem MaxEnt-Klassifikator bei unserem Vergleich klar unterlegen. 
 Besonders ab einer Trainingsset-Grösse von 10000 Tweets wird ein grosser Unterschied sichtbar.
+Dies legt die Vermutung nahe, dass die Fähigkeit von MaxEnt mit abhängigen Features umzugehen den Unterschied ausmacht.
+
+Die Accuracy beider Verfahren liesse sich durch ein anderes Trainingsset wahrscheinlich noch weiter erhöhen.
+
 
 % D. Literaturverzeichnis
 %***************************************************************************************************
@@ -401,9 +392,11 @@ Besonders ab einer Trainingsset-Grösse von 10000 Tweets wird ein grosser Unters
 \linespread{1.2}\selectfont
 \begin{thebibliography}{99}
 
-\bibitem{alp} Alpaydin, Ethem: \emph{Introduction to Machine Learning (2nd ed.)}. The MIT Press, 2010.
+\bibitem{alp} \textsc{Alpaydin}, Ethem: \emph{Introduction to Machine Learning (2nd ed.)}. The MIT Press, 2010.
 
-\bibitem{ai} Russell, Stuart J.; Norvig, Peter: \emph{Artificial Intelligence: A Modern Approach (3rd ed.)}. Pearson Education, 2003.
+\bibitem{dean} \textsc{Dean}, Jeffrey und \textsc{Ghemawat}, Sanjay: \emph{ MapReduce: Simplified Data Processing on Large Clusters}. In: Sixth Symposium on Operating System Design and Implementation, San Francisco 2004.
+
+\bibitem{ai} \textsc{Russell}, Stuart J. und \textsc{Norvig}, Peter: \emph{Artificial Intelligence: A Modern Approach (3rd ed.)}. Pearson Education, 2003.
 
 \bibitem{mlr} Wikipedia: \emph{Multinomial logistic regression}. \url{http://en.wikipedia.org/wiki/Multinomial_logistic_regression} (Stand 14.6.2014) 
 
