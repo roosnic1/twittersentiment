@@ -275,6 +275,25 @@ Abbildung 4.6  zeigt dass die parallel Ausführung der Filter Funktion signifika
 
 
 \chapter{Fazit}
+Die Parallele Ausführung der Sentiment Analyse und des Filterns ist ab einer grossen Anzahl Tweets bedeutend Schneller. Bei unseren Tests war die parallele Ausführung beim Filtern immer um den Faktor 2 schneller als die serielle Ausführung. Es ist zu erwarten dass dieser Faktor bei einer grösseren Menge an Tweets bestehen bleibt. Interessant ist auch dass der Overhead bei der parallelen Ausführung bei 100'000 und weniger Tweets ca. genau soviel Zeit einnimmt wie die serielle Ausführung.
+
+Bei der Sentiment Analyse ist schon bei weniger Tweets erkennbar dass die parallele Ausführung schneller ist. Bereits bei 100'00 Tweets dauert die serielle Ausführung bereits 2 mal so lange. Bei 1'000'000 Tweets braucht es schon fast 3 mal so lange. Es ist zu erwarten dass dieser Faktoren bei mehr Tweets zu nimmt.
+
+% Fitler: 10 workers, MPI: 4 workers
+%[(4.301783, 1000), (4.043133, 10000), (4.044184, 100000), (4.46258, 1000000)]
+%Filter: 1 worker, MPI: 1 worker
+%[(4.037695, 1000), (4.038852, 10000), (4.038983, 100000), (10.062303, 1000000)]
+
+%Fitler: 10 workers, MPI: 4 workers
+%[(0.708772, 1000), (1.070244, 10000), (4.545117, 100000), (40.366181, 1000000)]
+%Fitler: 10 workers, MPI: 6 workers
+%[(0.95488, 1000), (1.224783, 10000), (4.383731, 100000), (38.915281, 1000000)]
+%Fitler: 10 workers, MPI: 7 workers
+%[(1.024954, 1000), (1.296836, 10000), (4.558475, 100000), (40.077041, 1000000)]
+%Filter: 20 workers, MPI: 8 workers
+%[(1.124848, 1000), (1.523185, 10000), (4.824918, 100000), (41.11099, 1000000)]
+%Filter: 1 worker, MPI: 1 worker
+%[(0.673428, 1000), (1.669188, 10000), (11.060885, 100000), (110.175096, 1000000)]
 
 
 \end{document}
