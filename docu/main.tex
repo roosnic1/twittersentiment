@@ -126,7 +126,7 @@ Wir verwenden für diese Arbeit einen Naive-Bayes-Klassifikator sowie einen Maxi
 Auf der Suche nach einer vorklassifizierten Trainingsmenge für unsere Sentiment Analyse, wurden wir fündig auf \url{http://www.sentiment140.com}. 
 Die Entwickler von sentiment140 haben ein automatisiertes Klassifikationsverfahren verwendet, welches sie \qem{distant supervised learning} nennen. 
 Sie haben dafür die  Emoticons (Smileys, wie z.B. \verb|:-)|, \verb|:(| und \verb|:-D|) in den Tweets für eine Klassifikation herangezogen. 
-Dieses Verfahren ist natürlich nicht gleich akkurat wie eine menschlich vorgenommene Klassifikation, dafür lässt sich damit einen grossen klassifizierten Korpus erstellen.
+Dieses Verfahren ist natürlich nicht gleich akkurat wie eine menschlich vorgenommene Klassifikation, dafür lässt sich damit ein grosser klassifizierter Korpus erstellen.
 
 Der Korpus beinhaltet 1.6 Millionen klassifiezierte Tweets in einer CSV Datei und hat folgende 6 Datenfelder:
 \begin{enumerate}
@@ -138,20 +138,43 @@ Der Korpus beinhaltet 1.6 Millionen klassifiezierte Tweets in einer CSV Datei un
 \item Text des Tweets
 \end{enumerate}
 
-Das Trainings-Set ist nach dem \emph{Bag of words model} aufgebaut.
-
 
 \subsection{Tweet Preprocessing}
-@User, Hashtags, URLs, Retweets (RT), html entities
-nltk-tokenizer
-feature reduction
+Die Tweets im Trainings-Set, wie auch die Abfrageparameter für den Klassifikator müssen ein einheitliches Format haben.
+Wir verwenden dafür das bekannte \qem{Bag of words model}\footnote{\cite{ai}:866}, welches nur \emph{feature/value} Paare beinhaltet.
+Die einzelnen Wörter eines Tweets bilden dabei die Features, welche alle die Value \verb|True| haben.
+Die Information wie oft ein Wort in einem Tweet vorkommt und in welcher Reihenfolge, geht in diesem Modell verloren. Dafür kann man direkt mit mathematischen Funktionen darauf operieren, wie wir in Kapitel 3.1.3 sehen werden.
+
+\subsubsection{Parsing}
+Um die einzelnen Wörter aus einem Tweet herauszubekommen, um sie in den Bag of words füllen zu können, muss man diese zuerst herausparsen. 
+Wir verwenden dafür die Klasse \verb|nltk.tokenize.wordpunct_tokenize| des NLTK-Frameworks\footnote{Natural Language Toolkit, \url{http://www.nltk.org}}.
+
+\subsubsection{Feature Reduction}
+Viele Wörter, vor allem sogenannte Stopwörter, aber auch Satzzeichen und andere Wortfragmente, können keine Information über die Stimmung in einem Tweet liefern. 
+Diese Features werden deshalb vor dem Training entfernt, um das Modell des Klassifizierers nicht zu verzerren.
+
+Insbesondere bei Tweets gibt es eine ganze Menge von Features welche keinen Beitrag zur Sentiment Analyse liefern, und wir deshalb entfernen. 
+Es sind dies u.a. folgende Bestandteile eines Tweets:
+
+\begin{itemize}
+\item @User
+\item \#Hashtags
+\item URLs (also Links, beginnend mit http://...)
+\item Retweets (beginnen mit RT)
+\item HTML-Entities (z.B. \& codiert als \&amp;)
+\end{itemize}
+
+
+Die vollständige Liste der vorgenommenen Entfernungen ist im Quelltext der beiden Methoden \verb|preprocessTweet()| und \verb|filtered_bag_of_words()| in der Datei \verb|classifier_utils.py| ersichtlich. 
+
+
 
 \subsection{Klassifikationsalgorithmen}
 \subsubsection{Naive-Bayes}
 
 Der Naive-Bayes-Klassifikator macht sich die Wahrschentlichkeitsverteilung der Klassen und Features im Trainings-Set, sowie die Anwendung des Bayes-Theorem (Satz von Bayes) zunutze.
 
-Die Wahrscheinlichkeit dass ein Satz, bestehend aus den Wörtern (features) $F_1,\dots,F_n$, zu einer Klasse $C$ gehört, lässt sich als bedingte Wahrscheinlichkeit formulieren:
+Die Wahrscheinlichkeit dass ein Tweet, bestehend aus den Wörtern (Features) $F_1,\dots,F_n$, zu einer Klasse $C$ gehört, lässt sich als bedingte Wahrscheinlichkeit formulieren:
 $$ P(C \mid F_1,\dots,F_n)$$
 
 Für grosse $n$ wird diese Berechnung jedoch schwierig. Der Satz von Bayes erlaubt uns aber dieses Problem anders zu formulieren:
@@ -177,7 +200,7 @@ Trotzdem lassen sich in der Praxis gute Resultate erzielen mit diesem Verfahren.
 \\
 
 In unserer Implementation verwenden wir die Klasse\\
- \verb|nltk.classify.NaiveBayesClassifier| des NLTK-Frameworks
+ \verb|nltk.classify.NaiveBayesClassifier| des NLTK-Frameworks.
  
 %O(n)
 
@@ -198,7 +221,9 @@ In der binären Variante, d.h. wenn man nur zwei Klassen betrachtet, ist das Ver
 Das Filtern der Tweets wird mit dem Disco MapReduce Framework parallel ausgeführt. Die CSVJob Klasse erweitert die Job Klasse von dem Disco Framework. Das Keyword nach welchem gefiltert werden soll, kann nach der Initialisierung gesetzt werden. Beim starten des Jobs werden die Eingabedaten (CSV Dateien mit Tweets) übergeben. Für jede einzelne Datei wird ein eigener Worker gestartet und parallel ausgeführt. Das heisst die Eingabe Daten müssen bereits in gleichmässig grossen CSV Dateien verfügbar sein. Pro Worker wird nun eine \emph{map} Funktion gestartet. Die Funktion gibt nur die Tweets zurück an die \emph{reduce} Funktion welche das Keyword beinhalten. Die \emph{reduce} Funktion sammelt die Tweets aller Worker zusammen und gibt sie, wenn alle Worker beendet sind, zurück. Die zurück gegeben Daten befinden sich in einem Python Generator und werden direkt in eine CSV Dateien gespeichert und der Sentiment Analyse übergeben.
 
 \section{Parallele Sentiment Analyse}
-Die Sentiment Analyse wird mit dem MPI for Python Framework parallel ausgeführt. Die Funktion erwartet eine CSV Datei mit Tweets. Die gesamte Datei wird in ein Array geladen und dann gleichmässig aufgeteilt auf die Anzahl Worker mit denen der Prozess gestartet wurde. Der Classifier wird einmal initialisiert und mit den Testdaten geladen. Die aufgeteilten Arrays werden den Worker übergeben, welche für jeden Tweet einmal die Funktion \emph{classify\_tweet} aufgerufen. Wenn die Analyse positiv verläuft kriegt der Tweet eine +1 ansonsten eine -1. \newline{} 
+Die Sentiment Analyse wird mit dem MPI for Python Framework parallel ausgeführt. Die Funktion erwartet eine CSV Datei mit Tweets. Die gesamte Datei wird in ein Array geladen und dann gleichmässig aufgeteilt auf die Anzahl Worker mit denen der Prozess gestartet wurde. 
+Der Classifier wird auf jedem Worker einmal instanziert und mit den trainierten Modell-Daten geladen. 
+Die aufgeteilten Arrays werden den Worker übergeben, welche für jeden Tweet einmal die Funktion \emph{classify\_tweet} aufgerufen. Wenn die Analyse positiv verläuft kriegt der Tweet eine +1 ansonsten eine -1. \newline{} 
 %
 Für jeden Tweet wird das Datum in ein \emph{datetime} Objekt umgewandelt und auf den Tag, Monat und das Jahr des Tweets reduziert. Alle Sentiment Werte werden für einen Tag zusammen gezählt und geben so einen Stimmungsverlauf.
 
@@ -211,9 +236,12 @@ Das GUI\footnote{Graphical User Interface} haben wir aufgrund der knappen Zeitve
 
 \section{Naive Bayes vs. MaxEnt}
 
+Für den Vergleich der beiden Klassifikationsalgorithmen verwenden wir unterschiedlich grosse Trainingssets und werten die \emph{Accuracy} ($= \frac{\#richtige}{\#total}$ ) aus. 
+Als Testset dient das ebenfalls dem Korpus von sentiment140.com beiliegende, welches 499 von Hand klassifizierte Tweets umfasst.
+
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=0.9\textwidth]{bilder/cmp_nb_vs_me_S10_M300-16M.pdf}
+\includegraphics[width=0.75\textwidth]{bilder/cmp_nb_vs_me_S10_M300-16M.pdf}
 \caption{Accuracy}
 \label{img:acc}
 \end{center}
@@ -359,6 +387,9 @@ Bei der Sentiment Analyse ist schon bei weniger Tweets erkennbar dass die parall
 %Filter: 1 worker, MPI: 1 worker
 %[(0.673428, 1000), (1.669188, 10000), (11.060885, 100000), (110.175096, 1000000)]
 
+
+Der Naive-Bayes-Klassifikator ist dem MaxEnt-Klassifikator bei unserem Vergleich klar unterlegen. 
+Besonders ab einer Trainingsset-Grösse von 10000 Tweets wird ein grosser Unterschied sichtbar.
 
 % D. Literaturverzeichnis
 %***************************************************************************************************
