@@ -77,4 +77,12 @@ if rank == 0:
 		A = combine_dicts(A,sentiments,operator.add)
 
 	print A
-	print len(sentiments)
+	#sorted_A = sorted(A.iteritems(), key=operator.itemgetter(1))
+	print 'Sorted:'
+	sorted_A = []
+	for key in sorted(A.iterkeys()):
+		sorted_A.append((key, A[key]))
+	print sorted_A
+
+	print len(A)
+

@@ -14,16 +14,20 @@
 \usepackage[bookmarksnumbered, bookmarksopen=true]{hyperref}  % PDF wird mit Lesezeichen (verlinktes Inhaltsverzeichnis) versehen 
 
 \usepackage{listings} 
-%\usepackage{fancyhdr}
-%\pagestyle{fancy}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
 
-%\fancyhead{}
-%\fancyfoot{}
+\fancypagestyle{plain}{}
+
+
+\fancyhf{}
+\fancyfoot{}
 
 %\interfootnotelinepenalty=10000
 
 \title{Twitter Sentiment Analyse}
-\author{Jérémie Blaser, Nicolas Roos\\
+\author{Seminararbeit für Seminar Paralleles Rechnen\\
+	Jérémie Blaser, Nicolas Roos\\
 	ZHAW (Zürcher Hochschule für Angewandte Wissenschaften),\\
 	Zürich,\\
 	Switzerland,\\
@@ -32,10 +36,10 @@
 \date{\today}							% Activate to display a given date or no date
 
 
-%\fancyhead[C] {End-2-End Services/Monitoring}
-%\fancyfoot[C] {Seite \thepage}
-%\fancyfoot[L] {Nicolas Roos}
-%\fancyfoot[R] {\today}
+\fancyhead[OEC] {Seminararbeit: Twitter Sentiment Analyse}
+\fancyfoot[C] {Seite \thepage}
+\fancyfoot[L] {Jérémie Blaser, Nicolas Roos}
+\fancyfoot[R] {\today}
 
 
 \begin{document}
@@ -52,8 +56,6 @@
 
 
 \tableofcontents
-
-
 
 \chapter{Einleitung}
 \section{Motivation}
@@ -85,12 +87,9 @@ Dadurch ist die Beschaffung von einer grossen Menge Tweets über diese API nicht
 Als alternative gibt es die komerzielle API von DataSift\footnote{\url{http://dev.datasift.com/docs}}, welche ihre Twitter-Daten vermarktet.
 
 \section{Paralleles Rechnen}
-Für die parallele Ausführung wird ein Python Framework benutzt. Für die Sentiment Analyse und das Filtern der Tweets wird kein Cluster verwendet sondern mehrere Worker Prozesse welche auf dem Rechner parallel ausgeführt werden. Ein Grund dafür ist dass die Klassifikationen Algorithmen trainiert werden müssen um richtig zu funktionieren. Diese Trainingsdaten über das Netzwerk auszutauschen, würden in unserem Fall zu einer Verlangsamung führen. %Mehr???
+Für die parallele Ausführung wird ein Python Framework benutzt. Für die Sentiment Analyse und das Filtern der Tweets wird kein Cluster verwendet sondern mehrere Worker Prozesse welche auf dem Rechner parallel ausgeführt werden. Ein Grund dafür ist dass die Klassifikationen Algorithmen trainiert werden müssen um richtig zu funktionieren. Diese Trainingsdaten über das Netzwerk auszutauschen, würden in unserem Fall zu einer Verlangsamung führen.
 Zur Auswahl standen 2 Python Frameworks. Zum einen das Disco Framework mit dem Map Reduce verfahren. Zum andern das  MPI for Python Framework mit dem Message Passing Interface verfahren.
 
-lokalitäts Prinzip Mapreduce params wird sterilisiert. kein klassifizieret angeben
-
-worker müssen trainierten classifier deserialisieren $\Rightarrow$ besser nicht über netzwerk
 \subsection{Evaluation MapReduce vs. MPI}
 \subsubsection{Disco - MapReduce}
 Disco ist ein leichtes, Open-Source Framework dass das Map Reduce Programmiermodell, welches ursprünglich von Google entwickelt wurde\footnote{\textsc{Dean}, Jeffrey und \textsc{Ghemawat}, Sanjay: MapReduce: Simplified Data Processing on Large Clusters. In: Sixth Symposium on Operating System Design and Implementation, San Francisco 2004.}, anbietet. Für die Installation wird eine Linux/Unix Distribution oder ein Mac OS X System, einen SSH Daemon und Client, Erlang/OTP R14A oder neuer und Python 2.6.6 oder neuer benötigt. Für die Webdarstellung wird entweder Lighttpd 1.4.17 oder neuer oder Varnish 2.1.3 oder neuer benötigt. Disco kann auf dem Mac OS X mit Homebrew\footnote{Packet Manager für Mac OS X} installiert werden. Alternativ kann man auch den Source Code herunterladen und Disco selbständig kompilieren. Nach der installation braucht es noch einige kleinere Konfiguration bis Disco funktionsfähig ist. Danach kann mit Eingabedateien (Textdateien, CSV Dateien) und 2 Funktionen, Map und Reduce, das Framework erfolgreich benutz werden.
@@ -199,12 +198,13 @@ In der binären Variante, d.h. wenn man nur zwei Klassen betrachtet, ist das Ver
 Das Filtern der Tweets wird mit dem Disco MapReduce Framework parallel ausgeführt. Die CSVJob Klasse erweitert die Job Klasse von dem Disco Framework. Das Keyword nach welchem gefiltert werden soll, kann nach der Initialisierung gesetzt werden. Beim starten des Jobs werden die Eingabedaten (CSV Dateien mit Tweets) übergeben. Für jede einzelne Datei wird ein eigener Worker gestartet und parallel ausgeführt. Das heisst die Eingabe Daten müssen bereits in gleichmässig grossen CSV Dateien verfügbar sein. Pro Worker wird nun eine \emph{map} Funktion gestartet. Die Funktion gibt nur die Tweets zurück an die \emph{reduce} Funktion welche das Keyword beinhalten. Die \emph{reduce} Funktion sammelt die Tweets aller Worker zusammen und gibt sie, wenn alle Worker beendet sind, zurück. Die zurück gegeben Daten befinden sich in einem Python Generator und werden direkt in eine CSV Dateien gespeichert und der Sentiment Analyse übergeben.
 
 \section{Parallele Sentiment Analyse}
-%probleme mit Disco und Classifier.
-Die Sentiment Analyse wird mit dem MPI for Python Framework parallel ausgeführt. Die Funktion erwartet eine CSV Datei mit Tweets. Die gesamte Datei wird in ein Array geladen und dann gleichmässig aufgeitelt auf die Anzahl Worker mit denen der Prozess gestartet wurde. Der Classifier wird einmal initialisiert und mit den Testdaten geladen. Die aufgeteilten Arrays werden den Worker übergeben, welche für jeden Tweet einmal die Funktion \emph{classify\_tweet} aufgerufen. Wenn die Analyse positiv verläuft kriegt der Tweet eine +1 ansonsten eine -1. \newline{} 
+Die Sentiment Analyse wird mit dem MPI for Python Framework parallel ausgeführt. Die Funktion erwartet eine CSV Datei mit Tweets. Die gesamte Datei wird in ein Array geladen und dann gleichmässig aufgeteilt auf die Anzahl Worker mit denen der Prozess gestartet wurde. Der Classifier wird einmal initialisiert und mit den Testdaten geladen. Die aufgeteilten Arrays werden den Worker übergeben, welche für jeden Tweet einmal die Funktion \emph{classify\_tweet} aufgerufen. Wenn die Analyse positiv verläuft kriegt der Tweet eine +1 ansonsten eine -1. \newline{} 
 %
 Für jeden Tweet wird das Datum in ein \emph{datetime} Objekt umgewandelt und auf den Tag, Monat und das Jahr des Tweets reduziert. Alle Sentiment Werte werden für einen Tag zusammen gezählt und geben so einen Stimmungsverlauf.
 
 \section{GUI}
+%Wieso weg gelassen
+Das GUI\footnote{Graphical User Interface} haben wir aufgrund der knappen Zeitverhältnisse weg gelassen. Die Funktionen jedoch wurden alle so entwickelt, dass sie ohne weiteres aus einem GUI aufgerufen werden können.
 
 
 \chapter{Resultat}
@@ -239,7 +239,7 @@ Für jeden Tweet wird das Datum in ein \emph{datetime} Objekt umgewandelt und au
 \section{Performancevergleich}
 Für die Performancetests wurde ein MacBook Pro, Late 2013 mit folgenden Komponenten verwendet:
 \begin{description}
-\item[ Prozessor] 2.6 GHz Intel Core i7
+\item[ Prozessor] 2.6 GHz Intel Core i7 (4 physisch, 8 virtuelle)
 \item[ Arbeitsspeicher] 16 GB 1600 MHz DDR3
 \item[ Betriebsystem] OS X 10.9.3
 \item[ Python] Version 2.7.7
@@ -248,15 +248,16 @@ Für die Performancetests wurde ein MacBook Pro, Late 2013 mit folgenden Kompone
 \end{description}
 
 \subsection{Sentiment Analyse}
-Es ist sehr schnell ersichtlich, dass die parallele Ausführung der Sentiment Funktion bedeutend Schneller ist. In Abbildung 4.4 sieht man 4 parallele Jobs (4,6,7 und 8 Workers) und einen seriellen Job. Der schnellste parallele Job braucht für 1'000'000 Tweets 38.9 Sekunden und der serielle Job benötigt für dieselbe Menge 110.2 Sekunden. 
+Für den Performancevergleich wurde der Naive Bayes  Klassifikatior verwendet. Es ist sehr schnell ersichtlich, dass die parallele Ausführung der Sentiment Funktion bedeutend Schneller ist. In Abbildung 4.4 sieht man 4 parallele Jobs (4,6,7 und 8 Workers) und einen seriellen Job. Der schnellste parallele Job braucht für 1'000'000 Tweets 38.9 Sekunden und der serielle Job benötigt für dieselbe Menge 110.2 Sekunden. 
 
-\begin{figure}[h]
+\begin{figure}[h!]
 \begin{center}
 \includegraphics[width=0.7\textwidth]{bilder/time_senitment_par-ser.pdf}
 \caption{Sentiment Analyse (par vs ser)}
 \label{img:performancesentiment}
 \end{center}
 \end{figure}
+
 %Fitler: 10 workers, MPI: 4 workers
 %[(0.708772, 1000), (1.070244, 10000), (4.545117, 100000), (40.366181, 1000000)]
 %Fitler: 10 workers, MPI: 6 workers
@@ -281,9 +282,9 @@ Das ändern der Anzahl Worker hat keinen merkbaren Einfluss auf die Ausführungs
     \end{tabular}
 \end{table}
 
-Es war anzunehmen dass mit 6 Workern eine schneller Ausführung erreicht werden kann, weil die 2 restlichen Prozessorenkerne den overhead kompensieren könnten. Dies war aber nicht der Fall.
+Es war anzunehmen dass mit 6 Workern eine schneller Ausführung erreicht werden kann, weil die 2 restlichen Prozessorkerne den overhead kompensieren könnten. Dies war aber nicht der Fall.
 
-\begin{figure}[htbp]
+\begin{figure}[h]
 \begin{center}
 \includegraphics[width=0.75\textwidth]{bilder/time_senitment_par.pdf}
 \caption{Sentiment Analyse}
@@ -301,30 +302,45 @@ Es war anzunehmen dass mit 6 Workern eine schneller Ausführung erreicht werden 
 %[(1.112133, 1000), (1.406023, 10000), (4.5955, 100000), (40.263055, 1000000)]
 
 \subsection{Tweets Filtern}
-Abbildung 4.6  zeigt dass die parallel Ausführung der Filter Funktion signifikant schneller ist als die serielle Ausführung. Betrachtet man Abbildung 4.6 und 4.7 sieht man dass die Wahl des Keywords keinen Einfluss auf die Geschwindigkeit der Funktion haben.
-\begin{figure}[htbp]
+Abbildung 4.6  zeigt dass die parallele Ausführung der Filter Funktion signifikant schneller ist als die serielle Ausführung. Betrachtet man Abbildung 4.6 und 4.7 sieht man dass die Wahl des Keywords keinen Einfluss auf die Geschwindigkeit der Funktion haben.
+\begin{figure}[h]
 \begin{center}
-\includegraphics[width=0.9\textwidth]{bilder/time_filter_apple.pdf}
+\includegraphics[width=0.7\textwidth]{bilder/time_filter_apple.pdf}
 \caption{Performance keyword 'apple'}
 \label{img:performancefilter1}
 \end{center}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[h]
 \begin{center}
-\includegraphics[width=0.9\textwidth]{bilder/time_filter_obama.pdf}
+\includegraphics[width=0.7\textwidth]{bilder/time_filter_google.pdf}
+\caption{Performance keyword 'obama'}
+\label{img:performancefilter3}
+\end{center}
+\end{figure}
+
+\newpage{}
+\section{Plot Stimmungsverlauf}
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{bilder/moodPlotApple.pdf}
+\caption{Performance keyword 'obama'}
+\label{img:performancefilter3}
+\end{center}
+\end{figure}
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{bilder/moodPlotGoogle.pdf}
 \caption{Performance keyword 'obama'}
 \label{img:performancefilter3}
 \end{center}
 \end{figure}
 
 
-\section{Plot Stimmungsverlauf}
-
-
 \chapter{Fazit}
-Die Parallele Ausführung der Sentiment Analyse und des Filterns ist ab einer grossen Anzahl Tweets bedeutend Schneller. Bei unseren Tests war die parallele Ausführung beim Filtern immer um den Faktor 2 schneller als die serielle Ausführung. Es ist zu erwarten dass dieser Faktor bei einer grösseren Menge an Tweets bestehen bleibt. Interessant ist auch dass der Overhead bei der parallelen Ausführung bei 100'000 und weniger Tweets ca. genau soviel Zeit einnimmt wie die serielle Ausführung.
-
+Die Parallele Ausführung der Sentiment Analyse und des Filterns ist ab einer grossen Anzahl Tweets bedeutend Schneller. Bei unseren Tests war die parallele Ausführung beim Filtern immer um den Faktor 2 schneller als die serielle Ausführung. Es ist zu erwarten dass dieser Faktor bei einer grösseren Menge an Tweets bestehen bleibt. Interessant ist auch dass der Overhead bei der parallelen Ausführung bei 100'000 und weniger Tweets ca. genau soviel Zeit einnimmt wie die serielle Ausführung. \newline{}
 Bei der Sentiment Analyse ist schon bei weniger Tweets erkennbar dass die parallele Ausführung schneller ist. Bereits bei 100'00 Tweets dauert die serielle Ausführung bereits 2 mal so lange. Bei 1'000'000 Tweets braucht es schon fast 3 mal so lange. Es ist zu erwarten dass dieser Faktoren bei mehr Tweets zu nimmt.
 
 % Fitler: 10 workers, MPI: 4 workers
