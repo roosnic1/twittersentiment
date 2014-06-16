@@ -7,6 +7,7 @@
 \usepackage{float}					% TeX will automatically convert eps --> pdf in pdflatex
 
 \usepackage{amssymb}
+\usepackage{amsmath}
 \usepackage[utf8]{inputenc}
 \usepackage[german]{babel}
 \usepackage[T1]{fontenc} % ermöglicht die Silbentrennung von Wörtern mit Umlauten
@@ -130,14 +131,29 @@ Das Trainings-Set ist nach dem \emph{Bag of words model} aufgebaut.
 \subsubsection{Naive-Bayes}
 
 Der Naive-Bayes-Klassifikator macht sich die Wahrschentlichkeitsverteilung der Klassen und Features im Trainings-Set, sowie die Anwendung des Bayes-Theorem (Satz von Bayes) zunutze.
+$$ P(C \mid F_1,\dots,F_n)$$
 
+Satz von Bayes
 $$
-P(C \vert F_1,\dots,F_n) = \frac{P(C) \ P(F_1,\dots,F_n\vert C)}{P(F_1,\dots,F_n)}. \,
+P(C \mid F_1,\dots,F_n) = \frac{P(C) \ P(F_1,\dots,F_n\mid C )}{P(F_1,\dots,F_n)}. \,
 $$
 
+$$ P(X,Y \mid Z) = P(X \mid Z) \ P(Y \mid Z) $$
+
+naive, unabhängig -> bedingten unabhängigkeit
+$$
+P(C \mid F_1,\dots,F_n) = \frac{1}{W} \, P(C) \prod_{i=1}^n P(F_i\mid C)\ \ \ \mathrm{mit} \ \ W = P(F_1,\dots,F_n)
+$$
+
+$W$ konstant für aufruf -> weglassen
+$$ \mathrm{classify}(f_1,\dots,f_n) = \underset{c \, \in \, \{pos,neg\} }{\operatorname{arg\,max}} \ P(c) \displaystyle\prod_{i=1}^n P(f_i\mid c) $$
+
+die naive annahme entspricht nicht der realität, in der praxis jedoch gut ?cite?
 
 In unserer Implementation verwenden wir die Klasse\\
  \verb|nltk.classify.NaiveBayesClassifier| des NLTK-Frameworks
+ 
+%O(n)
 
 \subsubsection{MaxEnt}
 In unserer Implementation verwenden wir die Klasse\\
