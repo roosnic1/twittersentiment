@@ -7,6 +7,7 @@
 \usepackage{float}					% TeX will automatically convert eps --> pdf in pdflatex
 
 \usepackage{amssymb}
+\usepackage{amsmath}
 \usepackage[utf8]{inputenc}
 \usepackage[german]{babel}
 \usepackage[T1]{fontenc} % ermöglicht die Silbentrennung von Wörtern mit Umlauten
@@ -130,22 +131,51 @@ Das Trainings-Set ist nach dem \emph{Bag of words model} aufgebaut.
 
 Der Naive-Bayes-Klassifikator macht sich die Wahrschentlichkeitsverteilung der Klassen und Features im Trainings-Set, sowie die Anwendung des Bayes-Theorem (Satz von Bayes) zunutze.
 
+Die Wahrscheinlichkeit dass ein Satz, bestehend aus den Wörtern (features) $F_1,\dots,F_n$, zu einer Klasse $C$ gehört, lässt sich als bedingte Wahrscheinlichkeit formulieren:
+$$ P(C \mid F_1,\dots,F_n)$$
+
+Für grosse $n$ wird diese Berechnung jedoch schwierig. Der Satz von Bayes erlaubt uns aber dieses Problem anders zu formulieren:
 $$
-P(C \vert F_1,\dots,F_n) = \frac{P(C) \ P(F_1,\dots,F_n\vert C)}{P(F_1,\dots,F_n)}. \,
+P(C \mid F_1,\dots,F_n) = \frac{P(C) \ P(F_1,\dots,F_n\mid C )}{P(F_1,\dots,F_n)}
 $$
 
+Treffen wir weiter die \emph{naive} Annahme, dass gegeben einer Klasse $C$ das Auftreten der Features untereinander unabhängig ist,
+d.h. es gilt $P(F_i,F_j) = P(F_i)P(F_j)$, können wir die Regel der bedingten Unabhängigkeit\footnote{\cite{alp}:389 }
+
+$$ P(X,Y \mid Z) = P(X \mid Z) \ P(Y \mid Z) $$
+anwenden und die Berechnung weiter vereinfachen zu
+$$
+P(C \mid F_1,\dots,F_n) = \frac{1}{W} \, P(C) \prod_{i=1}^n P(F_i\mid C)\ \ \ \mathrm{mit} \ \ W = P(F_1,\dots,F_n).
+$$
+
+Nun können wir unabhängig von der Grösse unseres Trainings-Set, durch einfaches abzählen der Wörter und Klassen, die gesuchten Wahrscheinlichkeiten berechnen.
+Da $W$ konstant ist für einen gegebenen Input, können wir diesen Bruch weglassen und erhalten unseren Naive-Bayes-Klassifikator:
+$$ \mathrm{classify}(f_1,\dots,f_n) = \underset{c \, \in \, \{pos,neg\} }{\operatorname{arg\,max}} \ P(c) \displaystyle\prod_{i=1}^n P(f_i\mid c) $$
+
+Die naive Annahme, welche namensgebend ist für das Verfahren, entspricht natürlich nicht der Realität. 
+Trotzdem lassen sich in der Praxis gute Resultate erzielen mit diesem Verfahren.\footnote{\cite{ai}:499}
+\\
 
 In unserer Implementation verwenden wir die Klasse\\
  \verb|nltk.classify.NaiveBayesClassifier| des NLTK-Frameworks
+ 
+%O(n)
+
 
 \subsubsection{MaxEnt}
-In unserer Implementation verwenden wir die Klasse\\
-\verb|nltk.classify.scikitlearn.SklearnClassifier| zusammen mit\\
-\verb|sklearn.linear_model.LogisticRegression| des scikit-learn Frameworks.
+
+Der Maximum-Entropy-Klassifikator, kurz \emph{MaxEnt}, ist auch ein probabilistischer Klassifikator. Im unterschied zum Naive-Bayes-Klassifikator, kann er jedoch auch mit abhängigen Features umgehen und diese gut modellieren.
+In der Fachliteratur findet man fast nichts zu \emph{MaxEnt}. Dies liegt sehr wahrscheinlich daran, dass es mehrere Namen für das selbe Verfahren gibt. 
+Auf Wikipedia\cite{mlr} werden diese Verfahren unter \qem{Multinomial logistic regression} zusammengefasst. Dort gibt es auch eine Auflistung der verschiedenen Namen.
+
+In der binären Variante, d.h. wenn man nur zwei Klassen betrachtet, ist das Verfahren das selbe wie die logistische Regression. Wir verwenden daher in unserer Implementation die Klasse
+\verb|nltk.classify.scikitlearn.SklearnClassifier| zusammen mit
+\verb|sklearn.linear_model.LogisticRegression| des scikit-learn Frameworks\footnote{\url{http://scikit-learn.org}}.
 
 \subsection{Tweet Preprocessing}
 @User, Hashtags, URLs, Retweets (RT), html entities
 nltk-tokenizer
+feature reduction
 
 \section{Filtern mit MapReduce}
 Das Filtern der Tweets wird mit dem Disco MapReduce Framework parallel ausgeführt. Die CSVJob Klasse erweitert die Job Klasse von dem Disco Framework. Das Keyword nach welchem gefiltert werden soll, kann nach der Initialisierung gesetzt werden. Beim starten des Jobs werden die Eingabedaten (CSV Dateien mit Tweets) übergeben. Für jede einzelne Datei wird ein eigener Worker gestartet und parallel ausgeführt. Das heisst die Eingabe Daten müssen bereits in gleichmässig grossen CSV Dateien verfügbar sein. Pro Worker wird nun eine \emph{map} Funktion gestartet. Die Funktion gibt nur die Tweets zurück an die \emph{reduce} Funktion welche das Keyword beinhalten. Die \emph{reduce} Funktion sammelt die Tweets aller Worker zusammen und gibt sie, wenn alle Worker beendet sind, zurück. Die zurück gegeben Daten befinden sich in einem Python Generator und werden direkt in eine CSV Dateien gespeichert und der Sentiment Analyse übergeben.
@@ -294,5 +324,24 @@ Bei der Sentiment Analyse ist schon bei weniger Tweets erkennbar dass die parall
 %Filter: 1 worker, MPI: 1 worker
 %[(0.673428, 1000), (1.669188, 10000), (11.060885, 100000), (110.175096, 1000000)]
 
+
+% D. Literaturverzeichnis
+%***************************************************************************************************
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Literaturverzeichnis}
+
+
+\linespread{1.2}\selectfont
+\begin{thebibliography}{99}
+
+\bibitem{alp} Alpaydin, Ethem: \emph{Introduction to Machine Learning (2nd ed.)}. The MIT Press, 2010.
+
+\bibitem{ai} Russell, Stuart J.; Norvig, Peter: \emph{Artificial Intelligence: A Modern Approach (3rd ed.)}. Pearson Education, 2003.
+
+\bibitem{mlr} Wikipedia: \emph{Multinomial logistic regression}. \url{http://en.wikipedia.org/wiki/Multinomial_logistic_regression} (Stand 14.6.2014) 
+
+
+\end{thebibliography}
 
 \end{document}
