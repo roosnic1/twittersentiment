@@ -165,8 +165,12 @@ In unserer Implementation verwenden wir die Klasse\\
 nltk-tokenizer
 
 \section{Filtern mit MapReduce}
+Das Filtern der Tweets wird mit dem Disco MapReduce Framework parallel ausgeführt. Die CSVJob Klasse erweitert die Job Klasse von dem Disco Framework. Das Keyword nach welchem gefiltert werden soll kann nach der Initialisierung gesetzt werden. Beim starten des Jobs werden die Eingabedaten übergeben. Für jede einzelne Datei wird ein eigener Worker gestartet und parallel ausgeführt. Das heisst die Eingabe Daten müssen bereits in gleichmässig grossen CSV Dateien verfügbar sein. Pro Worker wird nun eine \emph{map} Funktion gestartet. Die Funktion gibt nur die Tweets zurück an die \emph{reduce} Funktion welche das Keyword beinhalten. Die \emph{reduce} Funktion sammelt die Tweets aller Worker zusammen und gibt sie, wenn alle Worker beendet sind, zurück. Die zurück gegeben Daten befinden sich in einem Python generator und werden direkt in eine CSV Dateien gespeichert und der Sentiment Analyse übergeben.
 
 \section{Parallele Sentiment Analyse}
+%probleme mit Disco und Classifier.
+Die Sentiment Analyse wird mit dem MPI for Python Framework parallel ausgeführt. Die Funktion erwartet eine CSV Datei mit Tweets. Die gesamte Datei wird in ein Array geladen und dann gleichmässig aufgeitelt auf die Anzahl Worker mit denen der Prozess gestartet wurde. Der Classifier wird einmal initialisiert und mit den Testdaten geladen. Die aufgeteilten Arrays werden den Worker übergeben welche für jeden Tweet einmal die Funktion \emph{classify\_tweet} aufgerufen. Wenn die Analyse positiv verläuft kriegt der Tweet eine +1 ansonsten eine -1. \newline{} 
+Für jeden Tweet wird das Datum in ein \emph{datetime} Objekt umgewandelt und auf den Tag, Monat und das Jahr des Tweets reduziert. Alle Sentiment Werte werden für einen Tag zusammen gezählt und geben so einen Stimmungsverlauf.
 
 \section{GUI}
 
@@ -204,19 +208,37 @@ nltk-tokenizer
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=0.9\textwidth]{bilder/time_par_vs_ser_google.pdf}
-\caption{Performance}
-\label{img:keyword 'google'}
+\includegraphics[width=0.9\textwidth]{bilder/time_senitment_par-ser.pdf}
+\caption{Sentiment Analyse}
+\label{img:performancesentiment}
 \end{center}
 \end{figure}
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=0.9\textwidth]{bilder/time_par_vs_ser_apple.pdf}
-\caption{Performance}
-\label{img:keyword 'apple'}
+\includegraphics[width=0.9\textwidth]{bilder/time_filter_apple.pdf}
+\caption{Performance keyword 'apple'}
+\label{img:performancefilter1}
 \end{center}
 \end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\textwidth]{bilder/time_filter_google.pdf}
+\caption{Performance keyword 'google'}
+\label{img:performancefilter2}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.9\textwidth]{bilder/time_filter_obama.pdf}
+\caption{Performance keyword 'obama'}
+\label{img:performancefilter3}
+\end{center}
+\end{figure}
+
+
 
 \section{Plot Stimmungsverlauf}
 
