@@ -79,11 +79,10 @@ Für diese Idee wird eine grosse Menge von Tweets über einen längeren Zeitraum
 \chapter{Anforderungen}
 
 \section{Twitter Korpus}
-genügend Tweets um Klassifizierer zu trainieren, historischer verlauf
-Twitter stellt für Entwickler eine moderne API (Application Programm Interface) zur Verfügung. Die aktuell version dieser API (Version 1.1) erlaubt dem Benutzer nach Tweets zu suchen oder die Timeline eines Benutzers anzuschauen. Die Menge von Tweets die bei solch einer Suche zurückgegeben wird, ist jedoch stark begrenzt. Pro Suche können ca. 15 Seiten mit maximal 100 Tweets gefunden werden\footnote{GET search. https://dev.twitter.com/docs/api/1/get/search. Zuletzt aufgerufen am 14.06.2014.}. Bei durchschnittlich 5700 Tweets pro Sekunde\footnote{New Tweets per second record, and how. https://blog.twitter.com/2013/new-tweets-per-second-record-and-how. Zuletzt aufgerufen am 14.06.2014} ist diese eine sehr geringe Menge. Dieser durchschnitt bezieht sich auf das Jahr 2013 und wird im Jahr 2014 sicherlich steigen.
+Twitter stellt für Entwickler eine moderne API\footnote{Application Programm Interface} zur Verfügung. Die aktuell version dieser API, Version 1.1, erlaubt dem Benutzer nach Tweets zu suchen oder die Timeline eines Benutzers auszugeben. Die Menge von Tweets die bei solch einer Suche zurückgegeben wird, ist jedoch stark begrenzt. Pro Suche können ca. 15 Seiten mit maximal 100 Tweets gefunden werden\footnote{GET search. https://dev.twitter.com/docs/api/1/get/search. Zuletzt aufgerufen am 14.06.2014.}. Bei durchschnittlich 5700 Tweets pro Sekunde\footnote{New Tweets per second record, and how. https://blog.twitter.com/2013/new-tweets-per-second-record-and-how. Zuletzt aufgerufen am 14.06.2014} ist diese eine sehr geringe Menge. Dieser durchschnitt bezieht sich auf das Jahr 2013 und wird im Jahr 2014 sicherlich steigen.
 Dadurch ist die Beschaffung von einer grossen Menge Tweets über die API nicht möglich. Als alternative gibt es Twitter Korpusse welche eine grosse Menge an Tweets beinhalten. 
 \newline{}
-Auf der Suche nach einem geeigneten Twitter korpus, für unsere Sentiment Analyse, wurden wir fündig auf www.sentiment140.com. Die Entwickler von sentiment140 haben eine Twitter Sentiment Analyse erfolgreich entwickelt und stellen ein Teil ihrer Testdaten zur Verfügung. Der Korpus beinhaltet 1,6 Millionen Tweets in einer CSV Datei und hat folgende 6 Datenfelder:
+Auf der Suche nach einem geeigneten Twitter Korpus, für unsere Sentiment Analyse, wurden wir fündig auf www.sentiment140.com. Die Entwickler von sentiment140 haben eine Twitter Sentiment Analyse Programm erfolgreich entwickelt und stellen ein Teil ihrer Testdaten zur Verfügung. Der Korpus beinhaltet 1.6 Millionen Tweets in einer CSV Datei und hat folgende 6 Datenfelder:
 \begin{enumerate}
 \item Polarität (0 = negativ, 2 = neutral, 4 = positiv)
 \item ID des Tweets
@@ -92,26 +91,26 @@ Auf der Suche nach einem geeigneten Twitter korpus, für unsere Sentiment Analys
 \item Benutzer welcher der Tweet geschrieben hat
 \item Text des Tweets
 \end{enumerate}
-Obwohl wir unsere eigene Sentiment Analyse implementieren benötigen wir die Polarität, weil dadurch unsere eigener Klassifizierungs Algorithmen trainiert werden. Mehr dazu weiter unten. 
+Obwohl wir unsere eigene Sentiment Analyse implementieren benötigen wir die Polarität, weil dadurch unsere eigener Klassifikatioren Algorithmen trainiert werden. Mehr dazu weiter unten.
 
 \section{Paralleles Rechnen}
-Für die Parallellisierung wurde ein Python Framework benutzt. Für die Sentiment Analyse wird kein Cluster verwendet sondern mehrere Worker Prozesse welche auf dem Rechner parallel ausgeführt werden. Ein Grund dafür war dass die Klassifizierungs Algorithmen trainiert werden müssen um zu funktionieren. Diese Trainingsdaten über das Netzwerk auszurauschen, würden in unserem Fall zu einer Verlangsamung führen. %Mehr???
-Zur Auswahl standen 2 Python Bibliotheken. Zum einen das Disco Framwork mit dem Map Reduce verfahren. Zum andern das  MPI for Python Framework mit dem Message Passing Interface verfahren.
+Für die parallele Ausführung wird ein Python Framework benutzt. Für die Sentiment Analyse und das Filtern der Tweets wird kein Cluster verwendet sondern mehrere Worker Prozesse welche auf dem Rechner parallel ausgeführt werden. Ein Grund dafür ist dass die Klassifikationen Algorithmen trainiert werden müssen um richtig zu funktionieren. Diese Trainingsdaten über das Netzwerk auszutauschen, würden in unserem Fall zu einer Verlangsamung führen. %Mehr???
+Zur Auswahl standen 2 Python Frameworks. Zum einen das Disco Framework mit dem Map Reduce verfahren. Zum andern das  MPI for Python Framework mit dem Message Passing Interface verfahren.
 
 lokalitäts Prinzip Mapreduce params wird sterilisiert. kein klassifizieret angeben
 
 worker müssen trainierten classifier deserialisieren $\Rightarrow$ besser nicht über netzwerk
 \subsection{Evaluation MapReduce vs. MPI}
 \subsubsection{Disco - MapReduce}
-Disco ist ein leichtes, Open-Source Framework dass das Map Reduce Programmiermodell, welches ursprünglich von Google entwickelt wurde\footnote{\textsc{Dean}, Jeffrey und \textsc{Ghemawat}, Sanjay: MapReduce: Simplified Data Processing on Large Clusters. In: Sixth Symposium on Operating System Design and Implementation, San Francisco 2004.}, anbietet. Für die Installation wird eine Linux/Unix Distribution oder ein Mac OS X System, einen SSH Daemon und Client, Erlang/OTP R14A oder neuer und Python 2.6.6 oder neuer benötigt. Für die Webdarstellung wird entweder Lighttpd 1.4.17 oder neuer oder Varnish 2.1.3 oder neuer benötigt. Disco kann auf dem Mac OS X mit Homebrew\footnote{Packet Manager für Mac OS X} installiert werden. Alternativ kann man auch den Source Code herunterladen und Disco selbständig kompilieren. Nach der installation braucht es noch einige kleinere Konfiguration bis Disco funktionsfähig ist. Ab jetzt kann mit Eingabedateien (Textdateien, CSV Dateien) und 2 Funktionen, Map und Reduce, das Framework benutz werden.
+Disco ist ein leichtes, Open-Source Framework dass das Map Reduce Programmiermodell, welches ursprünglich von Google entwickelt wurde\footnote{\textsc{Dean}, Jeffrey und \textsc{Ghemawat}, Sanjay: MapReduce: Simplified Data Processing on Large Clusters. In: Sixth Symposium on Operating System Design and Implementation, San Francisco 2004.}, anbietet. Für die Installation wird eine Linux/Unix Distribution oder ein Mac OS X System, einen SSH Daemon und Client, Erlang/OTP R14A oder neuer und Python 2.6.6 oder neuer benötigt. Für die Webdarstellung wird entweder Lighttpd 1.4.17 oder neuer oder Varnish 2.1.3 oder neuer benötigt. Disco kann auf dem Mac OS X mit Homebrew\footnote{Packet Manager für Mac OS X} installiert werden. Alternativ kann man auch den Source Code herunterladen und Disco selbständig kompilieren. Nach der installation braucht es noch einige kleinere Konfiguration bis Disco funktionsfähig ist. Danach kann mit Eingabedateien (Textdateien, CSV Dateien) und 2 Funktionen, Map und Reduce, das Framework erfolgreich benutz werden.
 \subsubsection{MPI for Python - Message Passing Interface}
 Das Message Passing Interface (MPI) ist ein Standard, welcher den Nachrichtenaustausch bei parallelen Berechnungen auf verteilten Computersystem beschreibt. Das MPI for Python Packte wurde auf den MPI-1/MPI2 Spezifikationen aufgebaut und bietet eine Objekt orientierte Schnittstelle an. Für die Installation von MPI for Python wird eine funktionierende MPI Distribution benötigt und Python 2.3 oder neuer. Die Installation ist relative einfach mit PIP\footnote{Installationsprogramm für Python-Pakete} auszuführen. Im Python Script wird die MPI Bibliothek importiert und die Scrips werden mit
 \begin{lstlisting}
 $ mpirun -n 5 python demo/helloworld.py
 \end{lstlisting}
-gestartet.\newline{}
-%Noch nicht sicher ob das hierher gehört.
-Wir haben uns für das Disco Framework entscheiden wegen der sehr einfachen Handhabung. Bei der Implementation der parallelen Sentiment Analyse haben wir jedoch bemerkt dass das Disco Framework Probleme hat beim Serialisieren und Deserialisieren des Klassifizierungsalgorithmus. Daher haben wir für die parallelisierung des Sentiment Analyse das MPI Framework verwendet.
+von der Konsole gestartet.\newline{}
+%Noch nicht sicher ob das hierher gehört, Nochmal anschauen
+Wir haben uns für das Disco Framework entschieden wegen der sehr einfachen Handhabung. Bei der Implementation der parallelen Sentiment Analyse haben wir jedoch bemerkt, dass das Disco Framework Probleme hat beim Serialisieren und Deserialisieren des Klassifizierungsalgorithmus. Daher haben wir für die parallele Ausführung der Sentiment Analyse das MPI Framework verwendet.
 
 \chapter{Umsetzung}
 
@@ -179,11 +178,12 @@ nltk-tokenizer
 feature reduction
 
 \section{Filtern mit MapReduce}
-Das Filtern der Tweets wird mit dem Disco MapReduce Framework parallel ausgeführt. Die CSVJob Klasse erweitert die Job Klasse von dem Disco Framework. Das Keyword nach welchem gefiltert werden soll kann nach der Initialisierung gesetzt werden. Beim starten des Jobs werden die Eingabedaten übergeben. Für jede einzelne Datei wird ein eigener Worker gestartet und parallel ausgeführt. Das heisst die Eingabe Daten müssen bereits in gleichmässig grossen CSV Dateien verfügbar sein. Pro Worker wird nun eine \emph{map} Funktion gestartet. Die Funktion gibt nur die Tweets zurück an die \emph{reduce} Funktion welche das Keyword beinhalten. Die \emph{reduce} Funktion sammelt die Tweets aller Worker zusammen und gibt sie, wenn alle Worker beendet sind, zurück. Die zurück gegeben Daten befinden sich in einem Python generator und werden direkt in eine CSV Dateien gespeichert und der Sentiment Analyse übergeben.
+Das Filtern der Tweets wird mit dem Disco MapReduce Framework parallel ausgeführt. Die CSVJob Klasse erweitert die Job Klasse von dem Disco Framework. Das Keyword nach welchem gefiltert werden soll, kann nach der Initialisierung gesetzt werden. Beim starten des Jobs werden die Eingabedaten (CSV Dateien mit Tweets) übergeben. Für jede einzelne Datei wird ein eigener Worker gestartet und parallel ausgeführt. Das heisst die Eingabe Daten müssen bereits in gleichmässig grossen CSV Dateien verfügbar sein. Pro Worker wird nun eine \emph{map} Funktion gestartet. Die Funktion gibt nur die Tweets zurück an die \emph{reduce} Funktion welche das Keyword beinhalten. Die \emph{reduce} Funktion sammelt die Tweets aller Worker zusammen und gibt sie, wenn alle Worker beendet sind, zurück. Die zurück gegeben Daten befinden sich in einem Python Generator und werden direkt in eine CSV Dateien gespeichert und der Sentiment Analyse übergeben.
 
 \section{Parallele Sentiment Analyse}
 %probleme mit Disco und Classifier.
-Die Sentiment Analyse wird mit dem MPI for Python Framework parallel ausgeführt. Die Funktion erwartet eine CSV Datei mit Tweets. Die gesamte Datei wird in ein Array geladen und dann gleichmässig aufgeitelt auf die Anzahl Worker mit denen der Prozess gestartet wurde. Der Classifier wird einmal initialisiert und mit den Testdaten geladen. Die aufgeteilten Arrays werden den Worker übergeben welche für jeden Tweet einmal die Funktion \emph{classify\_tweet} aufgerufen. Wenn die Analyse positiv verläuft kriegt der Tweet eine +1 ansonsten eine -1. \newline{} 
+Die Sentiment Analyse wird mit dem MPI for Python Framework parallel ausgeführt. Die Funktion erwartet eine CSV Datei mit Tweets. Die gesamte Datei wird in ein Array geladen und dann gleichmässig aufgeitelt auf die Anzahl Worker mit denen der Prozess gestartet wurde. Der Classifier wird einmal initialisiert und mit den Testdaten geladen. Die aufgeteilten Arrays werden den Worker übergeben, welche für jeden Tweet einmal die Funktion \emph{classify\_tweet} aufgerufen. Wenn die Analyse positiv verläuft kriegt der Tweet eine +1 ansonsten eine -1. \newline{} 
+%
 Für jeden Tweet wird das Datum in ein \emph{datetime} Objekt umgewandelt und auf den Tag, Monat und das Jahr des Tweets reduziert. Alle Sentiment Werte werden für einen Tag zusammen gezählt und geben so einen Stimmungsverlauf.
 
 \section{GUI}
@@ -219,28 +219,76 @@ Für jeden Tweet wird das Datum in ein \emph{datetime} Objekt umgewandelt und au
 
 
 \section{Performancevergleich}
+Für die Performancetests wurde ein MacBook Pro, Late 2013 mit folgenden Komponenten verwendet:
+\begin{description}
+\item[ Prozessor] 2.6 GHz Intel Core i7
+\item[ Arbeitsspeicher] 16 GB 1600 MHz DDR3
+\item[ Betriebsystem] OS X 10.9.3
+\item[ Python] Version 2.7.7
+\item[ Disco ] Version 0.5-56-g136b1ac
+\item[ MPI ] Version 3.1
+\end{description}
+
+\subsection{Sentiment Analyse}
+Es ist sehr schnell ersichtlich, dass die parallele Ausführung der Sentiment Funktion bedeutend Schneller ist. In Abbildung 4.4 sieht man 4 parallele Jobs (4,6,7 und 8 Workers) und einen seriellen Job. Der schnellste parallele Job braucht für 1'000'000 Tweets 38.9 Sekunden und der serielle Job benötigt für dieselbe Menge 110.2 Sekunden. 
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{bilder/time_senitment_par-ser.pdf}
+\caption{Sentiment Analyse (par vs ser)}
+\label{img:performancesentiment}
+\end{center}
+\end{figure}
+%Fitler: 10 workers, MPI: 4 workers
+%[(0.708772, 1000), (1.070244, 10000), (4.545117, 100000), (40.366181, 1000000)]
+%Fitler: 10 workers, MPI: 6 workers
+%[(0.95488, 1000), (1.224783, 10000), (4.383731, 100000), (38.915281, 1000000)]
+%Fitler: 10 workers, MPI: 7 workers
+%[(1.024954, 1000), (1.296836, 10000), (4.558475, 100000), (40.077041, 1000000)]
+%Filter: 20 workers, MPI: 8 workers
+%[(1.124848, 1000), (1.523185, 10000), (4.824918, 100000), (41.11099, 1000000)]
+%Filter: 1 worker, MPI: 1 worker
+%[(0.673428, 1000), (1.669188, 10000), (11.060885, 100000), (110.175096, 1000000)]
+
+Das ändern der Anzahl Worker hat keinen merkbaren Einfluss auf die Ausführungsgeschwindigkeit der Sentiment Analyse. In der Abbildung 4.5 sieht man dass alle 4 parallele Jobs etwa gleich lange brauchen.
+
+\begin{table}[h]
+    \begin{tabular}{|l|l|l|l|l|}
+    \hline
+    Workers/ Tweets         & 1'000    & 10'000   & 100'000  & 1'000'000 \\ \hline
+    4 Workers & 0.730369 & 1.027004 & 4.103374 & 38.110437 \\ \hline
+    6 Workers & 0.963817 & 1.177442 & 4.331552 & 38.666975 \\ \hline
+    7 Workers & 1.021573 & 1.316651 & 4.289592 & 41.529118 \\ \hline
+    8 Workers & 1.112133 & 1.406023 & 4.5955   & 40.263055 \\ \hline
+    \end{tabular}
+\end{table}
+
+Es war anzunehmen dass mit 6 Workern eine schneller Ausführung erreicht werden kann, weil die 2 restlichen Prozessorenkerne den overhead kompensieren könnten. Dies war aber nicht der Fall.
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=0.9\textwidth]{bilder/time_senitment_par-ser.pdf}
+\includegraphics[width=0.75\textwidth]{bilder/time_senitment_par.pdf}
 \caption{Sentiment Analyse}
 \label{img:performancesentiment}
 \end{center}
 \end{figure}
 
+%Fitler: 10 workers, MPI: 4 workers
+%[(0.730369, 1000), (1.027004, 10000), (4.103374, 100000), (38.110437, 1000000)]
+%Fitler: 10 workers, MPI: 6 workers
+%[(0.963817, 1000), (1.177442, 10000), (4.331552, 100000), (38.666975, 1000000)]
+%Fitler: 10 workers, MPI: 7 workers
+%[(1.021573, 1000), (1.316651, 10000), (4.289592, 100000), (41.529118, 1000000)]
+%Filter: 20 workers, MPI: 8 workers
+%[(1.112133, 1000), (1.406023, 10000), (4.5955, 100000), (40.263055, 1000000)]
+
+\subsection{Tweets Filtern}
+Abbildung 4.6  zeigt dass die parallel Ausführung der Filter Funktion signifikant schneller ist als die serielle Ausführung. Betrachtet man Abbildung 4.6 und 4.7 sieht man dass die Wahl des Keywords keinen Einfluss auf die Geschwindigkeit der Funktion haben.
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=0.9\textwidth]{bilder/time_filter_apple.pdf}
 \caption{Performance keyword 'apple'}
 \label{img:performancefilter1}
-\end{center}
-\end{figure}
-
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width=0.9\textwidth]{bilder/time_filter_google.pdf}
-\caption{Performance keyword 'google'}
-\label{img:performancefilter2}
 \end{center}
 \end{figure}
 
@@ -253,11 +301,11 @@ Für jeden Tweet wird das Datum in ein \emph{datetime} Objekt umgewandelt und au
 \end{figure}
 
 
-
 \section{Plot Stimmungsverlauf}
 
 
 \chapter{Fazit}
+
 
 % D. Literaturverzeichnis
 %***************************************************************************************************
