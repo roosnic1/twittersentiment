@@ -107,9 +107,17 @@ Das Message Passing Interface (MPI) ist ein Standard, welcher den Nachrichtenaus
 \begin{lstlisting}
 $ mpirun -n 5 python demo/helloworld.py
 \end{lstlisting}
-von der Konsole gestartet.\newline{}
-%Noch nicht sicher ob das hierher gehört, Nochmal anschauen
-Wir haben uns für das Disco Framework entschieden wegen der sehr einfachen Handhabung. Bei der Implementation der parallelen Sentiment Analyse haben wir jedoch bemerkt, dass das Disco Framework Probleme hat beim Serialisieren und Deserialisieren des Klassifizierungsalgorithmus. Daher haben wir für die parallele Ausführung der Sentiment Analyse das MPI Framework verwendet.
+von der Konsole gestartet.
+
+\subsubsection{Fazit}
+Wir haben uns für das Disco Framework entschieden wegen der sehr einfachen Handhabung.
+Bei der Implementation der parallelen Sentiment Analyse haben wir jedoch bemerkt, dass das Disco Framework für jeden Map-Aufruf alle Parameter zuerst deserialisiert. 
+Da ein trainierter Klassifizierer gut 100MB Speicher belegt und es keine andere Möglichkeit gibt, ausser ihn als Parameter zu übergeben, hat das deserialisieren zu einem unakzeptablen Overhead geführt. 
+Daher haben wir für die parallele Ausführung der Sentiment Analyse das MPI Framework verwendet.
+
+
+
+
 
 \chapter{Umsetzung}
 
