@@ -78,7 +78,6 @@ Für diese Idee wird eine grosse Menge von Tweets über einen längeren Zeitraum
 \chapter{Anforderungen}
 
 \section{Twitter Korpus}
-genügend Tweets um Klassifizierer zu trainieren, historischer verlauf
 Twitter stellt für Entwickler eine moderne API (Application Programm Interface) zur Verfügung. Die aktuell version dieser API (Version 1.1) erlaubt dem Benutzer nach Tweets zu suchen oder die Timeline eines Benutzers anzuschauen. Die Menge von Tweets die bei solch einer Suche zurückgegeben wird, ist jedoch stark begrenzt. Pro Suche können ca. 15 Seiten mit maximal 100 Tweets gefunden werden\footnote{GET search. https://dev.twitter.com/docs/api/1/get/search. Zuletzt aufgerufen am 14.06.2014.}. Bei durchschnittlich 5700 Tweets pro Sekunde\footnote{New Tweets per second record, and how. https://blog.twitter.com/2013/new-tweets-per-second-record-and-how. Zuletzt aufgerufen am 14.06.2014} ist diese eine sehr geringe Menge. Dieser durchschnitt bezieht sich auf das Jahr 2013 und wird im Jahr 2014 sicherlich steigen.
 Dadurch ist die Beschaffung von einer grossen Menge Tweets über die API nicht möglich. Als alternative gibt es Twitter Korpusse welche eine grosse Menge an Tweets beinhalten. 
 \newline{}
@@ -109,7 +108,7 @@ Das Message Passing Interface (MPI) ist ein Standard, welcher den Nachrichtenaus
 $ mpirun -n 5 python demo/helloworld.py
 \end{lstlisting}
 gestartet.\newline{}
-%Noch nicht sicher ob das hierher gehört.
+%Noch nicht sicher ob das hierher gehört, Nochmal anschauen
 Wir haben uns für das Disco Framework entschieden wegen der sehr einfachen Handhabung. Bei der Implementation der parallelen Sentiment Analyse haben wir jedoch bemerkt dass das Disco Framework Probleme hat beim Serialisieren und Deserialisieren des Klassifizierungsalgorithmus. Daher haben wir für die parallelisierung des Sentiment Analyse das MPI Framework verwendet.
 
 \chapter{Umsetzung}
@@ -200,10 +199,11 @@ Für die Performancetests wurde ein MacBook Pro, Late 2013 mit folgenden Kompone
 \end{description}
 
 \subsection{Sentiment Analyse}
-Es ist sehr schnell ersichtlich dass die parallele Ausführung der Sentiment Funktion bedeutend Schneller ist. In Abbildung 4.4 sieht man 4 parallele Jobs (4,6,7 und 8 Workers) und einen seriellen Job. Der schnellste parallele Job braucht für 1'000'000 Tweets 38.9 Sekunden und der serielle Job benötigt für dieselbe Menge 110.2 Sekunden.
-\begin{figure}[htbp]
+Es ist sehr schnell ersichtlich dass die parallele Ausführung der Sentiment Funktion bedeutend Schneller ist. In Abbildung 4.4 sieht man 4 parallele Jobs (4,6,7 und 8 Workers) und einen seriellen Job. Der schnellste parallele Job braucht für 1'000'000 Tweets 38.9 Sekunden und der serielle Job benötigt für dieselbe Menge 110.2 Sekunden. 
+
+\begin{figure}[h]
 \begin{center}
-\includegraphics[width=0.75\textwidth]{bilder/time_senitment_par-ser.pdf}
+\includegraphics[width=0.7\textwidth]{bilder/time_senitment_par-ser.pdf}
 \caption{Sentiment Analyse (par vs ser)}
 \label{img:performancesentiment}
 \end{center}
@@ -219,7 +219,21 @@ Es ist sehr schnell ersichtlich dass die parallele Ausführung der Sentiment Fun
 %Filter: 1 worker, MPI: 1 worker
 %[(0.673428, 1000), (1.669188, 10000), (11.060885, 100000), (110.175096, 1000000)]
 
-Das ändern der Anzahl Worker hat keinen merkbaren Einfluss auf die Ausführungsgeschwindigkeit der Sentiment Analyse. Es war anzunehmen dass mit 6 Workern eine schneller Ausführung erreicht werden kann, weil die 2 restlichen Prozessorenkerne den overhead kompensieren könnten. Dies war aber nicht der Fall.
+Das ändern der Anzahl Worker hat keinen merkbaren Einfluss auf die Ausführungsgeschwindigkeit der Sentiment Analyse. In der Abbildung 4.5 sieht man dass alle 4 parallele Jobs etwa gleich lange brauchen.
+
+\begin{table}[h]
+    \begin{tabular}{|l|l|l|l|l|}
+    \hline
+    ~         & 1'000    & 10'000   & 100'000  & 1'000'000 \\ \hline
+    4 Workers & 0.730369 & 1.027004 & 4.103374 & 38.110437 \\ \hline
+    6 Workers & 0.963817 & 1.177442 & 4.331552 & 38.666975 \\ \hline
+    7 Workers & 1.021573 & 1.316651 & 4.289592 & 41.529118 \\ \hline
+    8 Workers & 1.112133 & 1.406023 & 4.5955   & 40.263055 \\ \hline
+    \end{tabular}
+\end{table}
+
+Es war anzunehmen dass mit 6 Workern eine schneller Ausführung erreicht werden kann, weil die 2 restlichen Prozessorenkerne den overhead kompensieren könnten. Dies war aber nicht der Fall.
+
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=0.75\textwidth]{bilder/time_senitment_par.pdf}
