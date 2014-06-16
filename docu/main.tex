@@ -81,19 +81,10 @@ Für diese Idee wird eine grosse Menge von Tweets über einen längeren Zeitraum
 \chapter{Anforderungen}
 
 \section{Twitter Korpus}
-Twitter stellt für Entwickler eine moderne API\footnote{Application Programm Interface} zur Verfügung. Die aktuell version dieser API, Version 1.1, erlaubt dem Benutzer nach Tweets zu suchen oder die Timeline eines Benutzers auszugeben. Die Menge von Tweets die bei solch einer Suche zurückgegeben wird, ist jedoch stark begrenzt. Pro Suche können ca. 15 Seiten mit maximal 100 Tweets gefunden werden\footnote{GET search. https://dev.twitter.com/docs/api/1/get/search. Zuletzt aufgerufen am 14.06.2014.}. Bei durchschnittlich 5700 Tweets pro Sekunde\footnote{New Tweets per second record, and how. https://blog.twitter.com/2013/new-tweets-per-second-record-and-how. Zuletzt aufgerufen am 14.06.2014} ist diese eine sehr geringe Menge. Dieser durchschnitt bezieht sich auf das Jahr 2013 und wird im Jahr 2014 sicherlich steigen.
-Dadurch ist die Beschaffung von einer grossen Menge Tweets über die API nicht möglich. Als alternative gibt es Twitter Korpusse welche eine grosse Menge an Tweets beinhalten. 
-\newline{}
-Auf der Suche nach einem geeigneten Twitter Korpus, für unsere Sentiment Analyse, wurden wir fündig auf www.sentiment140.com. Die Entwickler von sentiment140 haben eine Twitter Sentiment Analyse Programm erfolgreich entwickelt und stellen ein Teil ihrer Testdaten zur Verfügung. Der Korpus beinhaltet 1.6 Millionen Tweets in einer CSV Datei und hat folgende 6 Datenfelder:
-\begin{enumerate}
-\item Polarität (0 = negativ, 2 = neutral, 4 = positiv)
-\item ID des Tweets
-\item Datum
-\item Die Suchabfrage mit der der Tweet gefunden wurde
-\item Benutzer welcher der Tweet geschrieben hat
-\item Text des Tweets
-\end{enumerate}
-Obwohl wir unsere eigene Sentiment Analyse implementieren benötigen wir die Polarität, weil dadurch unsere eigener Klassifikatioren Algorithmen trainiert werden. Mehr dazu weiter unten.
+Twitter stellt für Entwickler eine moderne API\footnote{Application Programming Interface} zur Verfügung. Die aktuell version dieser API, Version 1.1, erlaubt dem Benutzer nach Tweets zu suchen oder die Timeline eines Benutzers auszugeben. Die Menge von Tweets die bei solch einer Suche zurückgegeben wird, ist jedoch stark begrenzt. Pro Suche können ca. 15 Seiten mit maximal 100 Tweets gefunden werden\footnote{GET search. https://dev.twitter.com/docs/api/1/get/search. Zuletzt aufgerufen am 14.06.2014.}. Bei durchschnittlich 5700 Tweets pro Sekunde\footnote{New Tweets per second record, and how. https://blog.twitter.com/2013/new-tweets-per-second-record-and-how. Zuletzt aufgerufen am 14.06.2014} ist diese eine sehr geringe Menge. Dieser durchschnitt bezieht sich auf das Jahr 2013 und wird im Jahr 2014 sicherlich steigen.
+Dadurch ist die Beschaffung von einer grossen Menge Tweets über diese API nicht möglich.
+
+Als alternative gibt es die komerzielle API von DataSift\footnote{\url{http://dev.datasift.com/docs}}, welche ihre Twitter-Daten vermarktet.
 
 \section{Paralleles Rechnen}
 Für die parallele Ausführung wird ein Python Framework benutzt. Für die Sentiment Analyse und das Filtern der Tweets wird kein Cluster verwendet sondern mehrere Worker Prozesse welche auf dem Rechner parallel ausgeführt werden. Ein Grund dafür ist dass die Klassifikationen Algorithmen trainiert werden müssen um richtig zu funktionieren. Diese Trainingsdaten über das Netzwerk auszutauschen, würden in unserem Fall zu einer Verlangsamung führen.
@@ -131,7 +122,29 @@ Wir verwenden für diese Arbeit einen Naive-Bayes-Klassifikator sowie einen Maxi
 
 
 \subsection{Trainingsmenge}
+
+Auf der Suche nach einer vorklassifizierten Trainingsmenge für unsere Sentiment Analyse, wurden wir fündig auf \url{http://www.sentiment140.com}. 
+Die Entwickler von sentiment140 haben ein automatisiertes Klassifikationsverfahren verwendet, welches sie \qem{distant supervised learning} nennen. 
+Sie haben dafür die  Emoticons (Smileys, wie z.B. \verb|:-)|, \verb|:(| und \verb|:-D|) in den Tweets für eine Klassifikation herangezogen. 
+Dieses Verfahren ist natürlich nicht gleich akkurat wie eine menschlich vorgenommene Klassifikation, dafür lässt sich damit einen grossen klassifizierten Korpus erstellen.
+
+Der Korpus beinhaltet 1.6 Millionen klassifiezierte Tweets in einer CSV Datei und hat folgende 6 Datenfelder:
+\begin{enumerate}
+\item Polarität (0 = negativ, 2 = neutral, 4 = positiv)
+\item ID des Tweets
+\item Datum
+\item Die Suchabfrage mit der der Tweet gefunden wurde
+\item Benutzer welcher der Tweet geschrieben hat
+\item Text des Tweets
+\end{enumerate}
+
 Das Trainings-Set ist nach dem \emph{Bag of words model} aufgebaut.
+
+
+\subsection{Tweet Preprocessing}
+@User, Hashtags, URLs, Retweets (RT), html entities
+nltk-tokenizer
+feature reduction
 
 \subsection{Klassifikationsalgorithmen}
 \subsubsection{Naive-Bayes}
@@ -179,10 +192,7 @@ In der binären Variante, d.h. wenn man nur zwei Klassen betrachtet, ist das Ver
 \verb|nltk.classify.scikitlearn.SklearnClassifier| zusammen mit
 \verb|sklearn.linear_model.LogisticRegression| des scikit-learn Frameworks\footnote{\url{http://scikit-learn.org}}.
 
-\subsection{Tweet Preprocessing}
-@User, Hashtags, URLs, Retweets (RT), html entities
-nltk-tokenizer
-feature reduction
+
 
 \section{Filtern mit MapReduce}
 Das Filtern der Tweets wird mit dem Disco MapReduce Framework parallel ausgeführt. Die CSVJob Klasse erweitert die Job Klasse von dem Disco Framework. Das Keyword nach welchem gefiltert werden soll, kann nach der Initialisierung gesetzt werden. Beim starten des Jobs werden die Eingabedaten (CSV Dateien mit Tweets) übergeben. Für jede einzelne Datei wird ein eigener Worker gestartet und parallel ausgeführt. Das heisst die Eingabe Daten müssen bereits in gleichmässig grossen CSV Dateien verfügbar sein. Pro Worker wird nun eine \emph{map} Funktion gestartet. Die Funktion gibt nur die Tweets zurück an die \emph{reduce} Funktion welche das Keyword beinhalten. Die \emph{reduce} Funktion sammelt die Tweets aller Worker zusammen und gibt sie, wenn alle Worker beendet sind, zurück. Die zurück gegeben Daten befinden sich in einem Python Generator und werden direkt in eine CSV Dateien gespeichert und der Sentiment Analyse übergeben.
