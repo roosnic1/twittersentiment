@@ -20,5 +20,5 @@ $ python main.py
 
 Den NaiveBayes vs. MaxEnt Vergleich plotten:
 ```
-$ python comparison.py
+$ python comparison.py step size
 ```
