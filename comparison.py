@@ -6,7 +6,7 @@ from classifier_utils import *
 import matplotlib.pylab as plt
 import cPickle as pickle
 import os
-
+import argparse
 
 
 def create_even_training_set(size, labeld_features):
@@ -35,8 +35,13 @@ def compare_classifiers(test_set, full_training_labeld_features, step, max_size)
 
 
 if __name__ == "__main__":
-	step = 10
-	max_size = 300
+	parser = argparse.ArgumentParser(description='Compare Sentiment Classifiers.')
+	parser.add_argument('step', type=int, help='step size between comparisons')
+	parser.add_argument('size', type=int, help='max size of training set')
+	args = parser.parse_args()
+	step = args.step
+	max_size = args.size
+
 	print "Compare Sentiment Classifiers \nbuilding test set..."
 	tweetlist = loadTwitterCSV('trainingandtestdata/testdata.manual.2009.06.14.csv')
 	test_set = test_set_from_tweets(tweetlist)
