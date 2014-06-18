@@ -37,3 +37,4 @@ Den NaiveBayes vs. MaxEnt Vergleich plotten:
 ```
 $ python comparison.py step size
 ```
+Der resultierende Plott wird im unterordner `./plots/` gespeichert.
