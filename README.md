@@ -8,7 +8,8 @@ Alle erforderlichen Python Libraries installieren mit PIP:
 $ pip install -r requirements.txt
 ```
 
-Twitter Korpus von sentiment140.com downloaden und im Projektverzeichnis entpacken:
+Twitter Korpus von sentiment140.com downloaden und im Projektverzeichnis entpacken.
+auf der commandline split ausführen "split -l 100000 $TWITTERCORPUS$ csvdata/split" :
 [http://cs.stanford.edu/people/alecmgo/trainingandtestdata.zip]
 
 ### Ausführen
