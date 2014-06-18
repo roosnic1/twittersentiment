@@ -13,6 +13,20 @@ auf der commandline split ausführen "split -l 100000 $TWITTERCORPUS$ csvdata/sp
 [http://cs.stanford.edu/people/alecmgo/trainingandtestdata.zip]
 
 ### Ausführen
+Die Klassifizierer trainieren mit
+```
+$ python trainer.py me
+```
+```
+$ python trainer.py -h
+usage: trainer.py [-h] {nb,me}
+
+Train and save classifier model.
+
+positional arguments:
+  {nb,me}     choose between nb=NaiveBayes, me=MaxEnt
+```
+
 Das Hauptprogramm ausführen mit
 ```
 $ cd twittersentiment
