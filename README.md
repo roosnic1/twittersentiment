@@ -35,6 +35,14 @@ $ python main.py
 
 Den NaiveBayes vs. MaxEnt Vergleich plotten:
 ```
-$ python comparison.py step size
+$ python comparison.py 10 300
+$ python comparison.py -h
+usage: comparison.py [-h] step size
+
+Compare Sentiment Classifiers.
+
+positional arguments:
+  step        step size between comparisons
+  size        max size of training set
 ```
 Der resultierende Plott wird im unterordner `./plots/` gespeichert.
