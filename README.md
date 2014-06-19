@@ -30,7 +30,19 @@ positional arguments:
 Das Hauptprogramm ausführen mit
 ```
 $ cd twittersentiment
-$ python main.py
+$ python main.py apple
+```
+```
+$ python main.py -h
+usage: main.py [-h] keyword
+
+Execute Sentiment Analysis.
+
+positional arguments:
+  keyword     Keyword for Filtering
+
+optional arguments:
+  -h, --help  show this help message and exit
 ```
 
 Den NaiveBayes vs. MaxEnt Vergleich plotten:
