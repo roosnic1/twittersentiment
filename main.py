@@ -5,6 +5,7 @@ import csv
 import subprocess
 import shutil
 import datetime
+import argparse
 import matplotlib.pyplot as plt
 
 from disco.core import result_iterator
@@ -29,8 +30,8 @@ def executeFilter(keyword,csvDir,resultCSV):
 
 	return i
 
-def executeSentiment(mpiScript,mpiWorker,csvFile,verbose):
-	process = subprocess.Popen("mpirun -n "+str(mpiWorker)+" python "+mpiScript+" '"+csvFile+"'", shell=True,stdout=subprocess.PIPE)
+def executeSentiment(mpiScript,mpiWorker,csvFile,verbose,keyword):
+	process = subprocess.Popen("mpirun -n "+str(mpiWorker)+" python "+mpiScript+" '"+csvFile+"' "+keyword, shell=True,stdout=subprocess.PIPE)
 	if verbose:
 		for line in process.stdout:
 			print line
@@ -298,6 +299,12 @@ def executeTest():
 
 
 if __name__ == '__main__':
+	parser = argparse.ArgumentParser(description='Execute Sentiment Analysis.')
+	parser.add_argument('keyword', type=str, help='Keyword for Filtering')
+	#parser.add_argument('size', type=int, help='max size of training set')
+	args = parser.parse_args()
+	keyword = args.keyword
+
 	cwd = os.getcwd()
 	#csvFiles = []
 	#csvFiles.append(cwd+'/trainingandtestdata/training1600000.csv')
@@ -305,7 +312,9 @@ if __name__ == '__main__':
 	#executeTest()
 
 	filteredCSV = cwd + '/tmp/test.csv'
-	executeFilter('google',cwd+'/csvdata/*',filteredCSV)
-	executeSentiment('mpiTest.py',4,filteredCSV,True)
+	executeFilter(keyword,cwd+'/csvdata/*',filteredCSV)
+	executeSentiment('mpiTest.py',4,filteredCSV,True,keyword)
+	if 'Darwin' in os.uname():
+		os.system('open ./plots/moodplot.pdf')
 
 

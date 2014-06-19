@@ -9,6 +9,7 @@ import sys
 from datetime import datetime
 from mpi4py import MPI
 import operator
+import matplotlib.pyplot as plt
 
 
 
@@ -34,6 +35,7 @@ classifier = NBSentimentClassifier().load_model()
 if(rank == 0):
 	if len(sys.argv) > 1:
 		csvFile = sys.argv[1]
+		keyword = sys.argv[2]
 	else:
 		csvFile = 'trainingandtestdata/testdata.csv'
 
@@ -82,7 +84,12 @@ if rank == 0:
 	sorted_A = []
 	for key in sorted(A.iterkeys()):
 		sorted_A.append((key, A[key]))
-	print sorted_A
+	#print sorted_A
 
-	print len(A)
+	x_val = [datetime.strptime(str(x[0]),'%Y%m%d').date() for x in sorted_A]
+	y_val = [x[1] for x in sorted_A]
+	plt.xticks(rotation=30,size='small')
+	plt.plot(x_val,y_val,'b-',label='Parallel *4')
+	plt.title('Stimmungsverlauf "'+keyword+'"')
+	plt.savefig('./plots/moodplot.pdf', bbox_inches='tight')
 
